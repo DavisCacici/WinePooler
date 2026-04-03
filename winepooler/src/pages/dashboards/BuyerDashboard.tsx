@@ -1,0 +1,568 @@
+import { useState, useEffect, useRef } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../../lib/supabase/AuthContext'
+import { getBuyerProfile } from '../../lib/supabase/queries/buyerProfile'
+import { getBuyerPreferences, type BuyerPreferences } from '../../lib/supabase/queries/buyerPreferences'
+import { getPalletsByArea, buyerHasOrderOnPallet } from '../../lib/supabase/queries/virtualPallets'
+import { palletProgressLabel } from '../../lib/palletProgress'
+import CreatePalletModal from '../pallets/CreatePalletModal'
+import AddOrderModal from '../pallets/AddOrderModal'
+import FreezeNotification from '../../components/notifications/FreezeNotification'
+import PalletPricingBadge from '../../components/pallets/PalletPricingBadge'
+import InventoryStatusBadge from '../../components/pallets/InventoryStatusBadge'
+import { supabase } from '../../lib/supabase/client'
+
+interface BuyerPalletCard {
+  id: string
+  palletId: string
+  area: string
+  winery: string
+  progress: string
+  bottles: number
+  threshold: number
+  state: 'open' | 'frozen' | 'completed'
+  bulkPrice: number | null
+  retailPrice: number | null
+  availableStock: number | null
+  totalStock: number | null
+  allocatedBottles: number | null
+  inventoryId: string | null
+  inventorySyncError?: boolean
+}
+
+interface PalletFreezeNotification {
+  id: string
+  palletId: string
+  wineryName: string
+  areaName: string
+}
+
+const buyerNavigation = [
+  'Active Pallets',
+  'Area Demand',
+  'My Orders',
+  'Saved Wineries',
+  'Preferences',
+]
+
+export const isPalletPreferred = (
+  pallet: { area: string; winery: string },
+  prefs: BuyerPreferences | null
+): boolean => {
+  if (!prefs) {
+    return false
+  }
+
+  const keywords = prefs.preferred_appellations.map(keyword => keyword.toLowerCase())
+  if (keywords.length === 0) {
+    return false
+  }
+
+  const haystack = `${pallet.area} ${pallet.winery}`.toLowerCase()
+  return keywords.some(keyword => haystack.includes(keyword))
+}
+
+const BuyerDashboard = () => {
+  const [view, setView] = useState<'map' | 'grid'>('map')
+  const [areaId, setAreaId] = useState<string | null>(null)
+  const [activeAreaName, setActiveAreaName] = useState<string | null>(null)
+  const [pallets, setPallets] = useState<BuyerPalletCard[]>([])
+  const [loadingPallets, setLoadingPallets] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [palletRefreshToken, setPalletRefreshToken] = useState(0)
+  const [activePalletForOrder, setActivePalletForOrder] = useState<BuyerPalletCard | null>(null)
+  const [notifications, setNotifications] = useState<PalletFreezeNotification[]>([])
+  const palletsRef = useRef<BuyerPalletCard[]>([])
+  const [preferences, setPreferences] = useState<BuyerPreferences | null>(null)
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false)
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!user) return
+
+    let isMounted = true
+
+    getBuyerProfile(user.id)
+      .then(profile => {
+        if (!isMounted) return
+
+        if (!profile) {
+          navigate('/profile/complete')
+          return
+        }
+
+        if (!profile.macro_area_id) {
+          navigate('/profile/area')
+          return
+        }
+
+        setAreaId(profile.macro_area_id)
+        setActiveAreaName(profile.macro_area_name ?? null)
+      })
+      .catch(() => {
+        if (isMounted) {
+          navigate('/profile/complete')
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [user, navigate])
+
+  useEffect(() => {
+    if (!user) {
+      setPreferencesLoaded(true)
+      return
+    }
+
+    let isMounted = true
+
+    getBuyerPreferences(user.id)
+      .then(prefs => {
+        if (isMounted) {
+          setPreferences(prefs)
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPreferences(null)
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setPreferencesLoaded(true)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [user])
+
+  useEffect(() => {
+    if (!areaId) {
+      return
+    }
+
+    let isMounted = true
+    setLoadingPallets(true)
+
+    getPalletsByArea(areaId)
+      .then(rows => {
+        if (!isMounted) {
+          return
+        }
+
+        const mapped = rows.map(row => ({
+          id: row.id,
+          palletId: row.id,
+          area: row.area_name ?? activeAreaName ?? '',
+          winery: row.winery_name ?? 'Unknown winery',
+          progress: palletProgressLabel(row.bottle_count, row.threshold),
+          bottles: row.bottle_count,
+          threshold: row.threshold,
+          state: row.state,
+          bulkPrice: row.bulk_price_per_bottle,
+          retailPrice: row.retail_price_per_bottle,
+          availableStock: row.available_stock,
+          totalStock: row.total_stock,
+          allocatedBottles: row.allocated_bottles,
+          inventoryId: row.inventory_id,
+        }))
+
+        setPallets(mapped)
+      })
+      .catch(() => {
+        if (isMounted) {
+          setPallets([])
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setLoadingPallets(false)
+        }
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [areaId, palletRefreshToken, activeAreaName])
+
+  // Keep palletsRef in sync so the Realtime handler always sees fresh state
+  useEffect(() => {
+    palletsRef.current = pallets
+  }, [pallets])
+
+  useEffect(() => {
+    if (!areaId) return
+
+    const channel = supabase
+      .channel(`virtual_pallets:area_id=eq.${areaId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'virtual_pallets',
+          filter: `area_id=eq.${areaId}`,
+        },
+        (payload: any) => {
+          const updated = payload.new as { id: string; bottle_count: number; state: string }
+          setPallets(prev =>
+            prev.map(p =>
+              p.palletId === updated.id
+                ? {
+                    ...p,
+                    bottles: updated.bottle_count,
+                    progress: palletProgressLabel(updated.bottle_count, p.threshold),
+                    state: updated.state as BuyerPalletCard['state'],
+                  }
+                : p
+            )
+          )
+
+          // Check if pallet just froze and current buyer has an order on it
+          if (updated.state === 'frozen' && user) {
+            const existing = palletsRef.current.find(p => p.palletId === updated.id)
+            const wineryName = existing?.winery ?? ''
+            const areaLabel = existing?.area ?? activeAreaName ?? ''
+            buyerHasOrderOnPallet(updated.id, user.id)
+              .then(hasOrder => {
+                if (hasOrder) {
+                  setNotifications(prev => [
+                    ...prev,
+                    {
+                      id: crypto.randomUUID(),
+                      palletId: updated.id,
+                      wineryName,
+                      areaName: areaLabel,
+                    },
+                  ])
+                }
+              })
+              .catch(() => { /* non-blocking */ })
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [areaId])
+
+  // Realtime: wine_inventory updates → refresh stock on matching pallet cards
+  useEffect(() => {
+    if (!areaId) return
+
+    const inventoryChannel = supabase
+      .channel(`inventory-area-${areaId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'wine_inventory',
+        },
+        (payload: any) => {
+          const updated = payload.new as {
+            id: string
+            total_stock: number
+            allocated_bottles: number
+          }
+          setPallets(prev =>
+            prev.map(p =>
+              p.inventoryId === updated.id
+                ? {
+                    ...p,
+                    totalStock: updated.total_stock,
+                    allocatedBottles: updated.allocated_bottles,
+                    availableStock: updated.total_stock - updated.allocated_bottles,
+                    inventorySyncError: false,
+                  }
+                : p
+            )
+          )
+        }
+      )
+      .subscribe((status: string) => {
+        if (status === 'CHANNEL_ERROR') {
+          setPallets(prev => prev.map(p => ({ ...p, inventorySyncError: true })))
+        }
+      })
+
+    return () => {
+      supabase.removeChannel(inventoryChannel)
+    }
+  }, [areaId])
+
+  const handleOrderAdded = (palletId: string, newCount: number, newState: 'open' | 'frozen') => {
+    setPallets(prev =>
+      prev.map(p =>
+        p.palletId === palletId
+          ? {
+              ...p,
+              bottles: newCount,
+              progress: palletProgressLabel(newCount, p.threshold),
+              state: newState,
+            }
+          : p
+      )
+    )
+  }
+
+  const dismissNotification = (id: string) =>
+    setNotifications(prev => prev.filter(n => n.id !== id))
+
+  const visiblePallets = activeAreaName ? pallets.filter(pallet => pallet.area === activeAreaName) : pallets
+  const hasPreferences =
+    preferences !== null &&
+    (preferences.preferred_wine_types.length > 0 || preferences.preferred_appellations.length > 0)
+
+  return (
+    <div className="min-h-screen bg-slate-50 px-6 py-8">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <header className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+            Buyer Dashboard · {activeAreaName ?? 'All Areas'}
+          </p>
+          {hasPreferences && (
+            <span className="mt-3 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+              Preferences set
+            </span>
+          )}
+          <div className="mt-3 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-slate-900">Map active pallets and switch to grid detail</h1>
+              <p className="mt-2 max-w-2xl text-slate-600">
+                Monitor area-wide demand, compare pallet progress, and move quickly from geography to order-ready inventory.
+              </p>
+            </div>
+            <nav aria-label="Buyer dashboard navigation" className="flex flex-wrap gap-3">
+              {buyerNavigation.map(item => (
+                item === 'Preferences' ? (
+                  <Link
+                    key={item}
+                    to="/profile/preferences"
+                    className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700"
+                  >
+                    {item}
+                  </Link>
+                ) : (
+                  <a
+                    key={item}
+                    href="#"
+                    className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700"
+                  >
+                    {item}
+                  </a>
+                )
+              ))}
+              <Link
+                to="/profile/area"
+                className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700"
+              >
+                Change Area
+              </Link>
+            </nav>
+          </div>
+          {preferencesLoaded && preferences === null && (
+            <p className="mt-3 text-sm text-slate-600">
+              <Link to="/profile/preferences" className="text-emerald-700 underline">
+                Set preferences
+              </Link>{' '}
+              to highlight matching pallets.
+            </p>
+          )}
+        </header>
+
+        <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">Pallet discovery</h2>
+              <p className="text-sm text-slate-600">Toggle between macro-area map view and pallet grid view.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              >
+                + New Pallet
+              </button>
+              <div className="flex gap-2 rounded-full bg-slate-100 p-1">
+              <button
+                type="button"
+                onClick={() => setView('map')}
+                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'map' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}
+              >
+                Map View
+              </button>
+              <button
+                type="button"
+                onClick={() => setView('grid')}
+                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}
+              >
+                Grid View
+              </button>
+              </div>
+            </div>
+          </div>
+
+          {loadingPallets && <p className="mt-4 text-sm text-slate-600">Loading pallets...</p>}
+
+          {view === 'map' ? (
+            <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+              <div className="rounded-3xl bg-gradient-to-br from-emerald-100 via-white to-cyan-100 p-6">
+                <h3 className="text-lg font-semibold text-slate-900">Map View</h3>
+                <div className="mt-5 grid gap-4 md:grid-cols-3">
+                  {visiblePallets.map(pallet => (
+                    <article
+                      key={pallet.id}
+                      className={`rounded-2xl bg-white/90 p-4 shadow-sm ${
+                        isPalletPreferred(pallet, preferences) ? 'ring-2 ring-emerald-500' : ''
+                      }`}
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{pallet.area}</p>
+                      <p className="mt-2 text-base font-semibold text-slate-900">{pallet.winery}</p>
+                      <p className="mt-1 text-sm text-slate-600">Progress {pallet.progress}</p>
+                      <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} compact />
+                      <InventoryStatusBadge
+                        availableStock={pallet.availableStock}
+                        allocatedBottles={pallet.allocatedBottles}
+                        totalStock={pallet.totalStock}
+                        syncError={pallet.inventorySyncError}
+                      />
+                      {pallet.state !== 'open' && (
+                        <span className="mt-2 inline-block rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          {pallet.state}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        disabled={pallet.state !== 'open' || (pallet.availableStock !== null && pallet.availableStock <= 0)}
+                        onClick={() => setActivePalletForOrder(pallet)}
+                        className="mt-3 w-full rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        Add Order
+                      </button>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-3xl bg-slate-900 p-6 text-white">
+                <h3 className="text-lg font-semibold">Area demand snapshot</h3>
+                <ul className="mt-4 space-y-3 text-sm text-slate-200">
+                  <li>North Milan demand spike: +18% week over week</li>
+                  <li>Lake Garda pallet ETA: 2 days to freeze</li>
+                  <li>Turin Center has the fastest fill velocity</li>
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-slate-900">Grid View</h3>
+              <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {visiblePallets.map(pallet => (
+                  <article
+                    key={pallet.id}
+                    className={`rounded-2xl border border-slate-200 bg-slate-50 p-5 ${
+                      isPalletPreferred(pallet, preferences) ? 'ring-2 ring-emerald-500' : ''
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{pallet.id}</p>
+                      {pallet.state !== 'open' && (
+                        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          {pallet.state}
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="mt-2 text-lg font-semibold text-slate-900">{pallet.winery}</h4>
+                    <p className="mt-1 text-sm text-slate-600">{pallet.area}</p>
+                    <div className="mt-4 h-2 rounded-full bg-slate-200">
+                      <div className="h-2 rounded-full bg-emerald-600" style={{ width: pallet.progress }} />
+                    </div>
+                    <p className="mt-3 text-sm text-slate-700">{pallet.bottles} bottles committed</p>
+                    <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} />
+                    <InventoryStatusBadge
+                      availableStock={pallet.availableStock}
+                      allocatedBottles={pallet.allocatedBottles}
+                      totalStock={pallet.totalStock}
+                      syncError={pallet.inventorySyncError}
+                    />
+                    <button
+                      type="button"
+                      disabled={pallet.state !== 'open' || (pallet.availableStock !== null && pallet.availableStock <= 0)}
+                      onClick={() => setActivePalletForOrder(pallet)}
+                      className="mt-4 w-full rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Add Order
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {showCreateModal && user && areaId && (
+          <CreatePalletModal
+            areaId={areaId}
+            areaName={activeAreaName}
+            buyerUserId={user.id}
+            onClose={() => setShowCreateModal(false)}
+            onCreated={() => {
+              setShowCreateModal(false)
+              setPalletRefreshToken(value => value + 1)
+            }}
+          />
+        )}
+
+        {activePalletForOrder && user && (
+          <AddOrderModal
+            pallet={{
+              id: activePalletForOrder.palletId,
+              area_id: areaId ?? '',
+              winery_id: '',
+              state: activePalletForOrder.state,
+              bottle_count: activePalletForOrder.bottles,
+              threshold: activePalletForOrder.threshold,
+              created_by: '',
+              bulk_price_per_bottle: null,
+              retail_price_per_bottle: null,
+              inventory_id: null,
+              available_stock: null,
+              total_stock: null,
+              allocated_bottles: null,
+              area_name: activePalletForOrder.area,
+              winery_name: activePalletForOrder.winery,
+            }}
+            buyerUserId={user.id}
+            onClose={() => setActivePalletForOrder(null)}
+            onOrderAdded={(newCount, newState) => {
+              handleOrderAdded(activePalletForOrder.palletId, newCount, newState)
+              setActivePalletForOrder(null)
+            }}
+          />
+        )}
+      </div>
+
+      {/* Freeze notification stack */}
+      <div className="fixed right-4 top-4 z-50 flex w-80 flex-col gap-3">
+        {notifications.map(n => (
+          <FreezeNotification
+            key={n.id}
+            wineryName={n.wineryName}
+            areaName={n.areaName}
+            onDismiss={() => dismissNotification(n.id)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default BuyerDashboard
