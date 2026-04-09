@@ -1,6 +1,6 @@
 # Story 5.2: Bulk Payout Processing
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -45,55 +45,55 @@ so that administrative overhead is reduced.
 
 ## Tasks / Subtasks
 
-- [ ] Add Stripe Connect linkage on winery profile (AC: 2, 4)
-  - [ ] Add `stripe_connect_account_id` nullable column to `public.winery_profiles`
-  - [ ] Add unique partial index where not null
-  - [ ] Preserve existing RLS policies; only winery owner can update own linked account
-  - [ ] Add validation pattern in app layer for `acct_` prefix
-- [ ] Create payout persistence schema (AC: 1, 2, 3, 4, 6)
-  - [ ] Create `pallet_payouts` table with: `id`, `pallet_id`, `winery_id`, `stripe_transfer_id`, `gross_amount_cents`, `commission_amount_cents`, `net_amount_cents`, `currency`, `status`, `failure_reason`, `processed_at`, `created_at`, `updated_at`
-  - [ ] Add unique constraint `UNIQUE (pallet_id)` to enforce one payout per pallet
-  - [ ] Add status constraint: `pending | processing | paid | failed`
-  - [ ] Add indexes on `winery_id`, `status`, `processed_at`
-  - [ ] Create `pallet_payout_items` table that stores per-authorization contribution: `payout_id`, `payment_authorization_id`, `amount_cents`
-- [ ] Add payout eligibility SQL function (AC: 1, 6)
-  - [ ] Create `get_pallet_payout_summary(p_pallet_id uuid)` returning: `gross_cents`, `captured_count`, `currency`, `is_eligible`
-  - [ ] Eligibility rules: pallet must be `completed`; all linked `payment_authorizations` must be `captured`; no existing `paid` payout row
-  - [ ] Base amounts on `payment_authorizations.amount_cents` to avoid float errors
-- [ ] Add idempotent payout claim function (AC: 3)
-  - [ ] Create `claim_pallet_for_payout(p_pallet_id uuid)` that atomically inserts or returns an existing payout row with `processing` lock semantics
-  - [ ] Ensure duplicate invocations cannot create multiple payout rows due to unique `pallet_id`
-  - [ ] Return deterministic outcome: `claimed | already_paid | already_processing | not_eligible`
-- [ ] Create payout processing Edge Function (AC: 1, 2, 3, 4, 6)
-  - [ ] Create `supabase/functions/process-pallet-payout/index.ts`
-  - [ ] Validate JWT and role (`winery` or admin/internal job context)
-  - [ ] Resolve caller winery profile and verify pallet belongs to that winery unless admin override
-  - [ ] Retrieve payout summary and commission rules
-  - [ ] Create Stripe Transfer to `stripe_connect_account_id` with idempotency key `pallet_payout:{pallet_id}`
-  - [ ] Persist/transition `pallet_payouts` row and write `pallet_payout_items`
-  - [ ] On failure set payout row to `failed` + reason; keep retriable
-- [ ] Add fulfillment confirmation endpoint (AC: 1)
-  - [ ] Create `supabase/functions/confirm-pallet-fulfillment/index.ts`
-  - [ ] Transition pallet state from `frozen` to `completed` (or verify already completed)
-  - [ ] Trigger `process-pallet-payout` after completion confirmation
-  - [ ] Return combined result: fulfillment status + payout status
-- [ ] Add commission configuration source (AC: 1, 5, 6)
-  - [ ] Create simple config table `platform_fees` or env-driven rate (e.g., 5%) with explicit decimal precision
-  - [ ] Store the exact commission rate used per payout row (`commission_bps` or equivalent)
-  - [ ] Round by integer cents only; no floating point math
-- [ ] Extend query layer for winery payout visibility (AC: 5)
-  - [ ] Add `getWineryPayouts(wineryId)` query module in `src/lib/supabase/queries/payouts.ts`
-  - [ ] Extend `getWineryPickingList` in `virtualPallets.ts` to include payout status fields
-  - [ ] Add `getPalletPayoutDetail(palletId)` for drill-down/audit view
-- [ ] Update Winery Dashboard UI (AC: 5)
-  - [ ] Add payout status column to the picking list table (`pending`, `processing`, `paid`, `failed`)
-  - [ ] Add net payout KPI and fees KPI cards
-  - [ ] Add retry action for `failed` payout rows (calls `process-pallet-payout`)
-- [ ] Add payout reconciliation tests (AC: 3, 4, 6)
-  - [ ] Test duplicate payout trigger race results in one transfer and one payout row
-  - [ ] Test failed Stripe transfer marks row `failed` and allows retry
-  - [ ] Test payout math: `gross = sum(captured authorizations)`, `net = gross - commission`
-  - [ ] Test reconciliation query returns transfer id and linked authorization item rows
+- [x] Add Stripe Connect linkage on winery profile (AC: 2, 4)
+  - [x] Add `stripe_connect_account_id` nullable column to `public.winery_profiles`
+  - [x] Add unique partial index where not null
+  - [x] Preserve existing RLS policies; only winery owner can update own linked account
+  - [x] Add validation pattern in app layer for `acct_` prefix
+- [x] Create payout persistence schema (AC: 1, 2, 3, 4, 6)
+  - [x] Create `pallet_payouts` table with: `id`, `pallet_id`, `winery_id`, `stripe_transfer_id`, `gross_amount_cents`, `commission_amount_cents`, `net_amount_cents`, `currency`, `status`, `failure_reason`, `processed_at`, `created_at`, `updated_at`
+  - [x] Add unique constraint `UNIQUE (pallet_id)` to enforce one payout per pallet
+  - [x] Add status constraint: `pending | processing | paid | failed`
+  - [x] Add indexes on `winery_id`, `status`, `processed_at`
+  - [x] Create `pallet_payout_items` table that stores per-authorization contribution: `payout_id`, `payment_authorization_id`, `amount_cents`
+- [x] Add payout eligibility SQL function (AC: 1, 6)
+  - [x] Create `get_pallet_payout_summary(p_pallet_id uuid)` returning: `gross_cents`, `captured_count`, `currency`, `is_eligible`
+  - [x] Eligibility rules: pallet must be `completed`; all linked `payment_authorizations` must be `captured`; no existing `paid` payout row
+  - [x] Base amounts on `payment_authorizations.amount_cents` to avoid float errors
+- [x] Add idempotent payout claim function (AC: 3)
+  - [x] Create `claim_pallet_for_payout(p_pallet_id uuid)` that atomically inserts or returns an existing payout row with `processing` lock semantics
+  - [x] Ensure duplicate invocations cannot create multiple payout rows due to unique `pallet_id`
+  - [x] Return deterministic outcome: `claimed | already_paid | already_processing | not_eligible`
+- [x] Create payout processing Edge Function (AC: 1, 2, 3, 4, 6)
+  - [x] Create `supabase/functions/process-pallet-payout/index.ts`
+  - [x] Validate JWT and role (`winery` or admin/internal job context)
+  - [x] Resolve caller winery profile and verify pallet belongs to that winery unless admin override
+  - [x] Retrieve payout summary and commission rules
+  - [x] Create Stripe Transfer to `stripe_connect_account_id` with idempotency key `pallet_payout:{pallet_id}`
+  - [x] Persist/transition `pallet_payouts` row and write `pallet_payout_items`
+  - [x] On failure set payout row to `failed` + reason; keep retriable
+- [x] Add fulfillment confirmation endpoint (AC: 1)
+  - [x] Create `supabase/functions/confirm-pallet-fulfillment/index.ts`
+  - [x] Transition pallet state from `frozen` to `completed` (or verify already completed)
+  - [x] Trigger `process-pallet-payout` after completion confirmation
+  - [x] Return combined result: fulfillment status + payout status
+- [x] Add commission configuration source (AC: 1, 5, 6)
+  - [x] Create simple config table `platform_fees` or env-driven rate (e.g., 5%) with explicit decimal precision
+  - [x] Store the exact commission rate used per payout row (`commission_bps` or equivalent)
+  - [x] Round by integer cents only; no floating point math
+- [x] Extend query layer for winery payout visibility (AC: 5)
+  - [x] Add `getWineryPayouts(wineryId)` query module in `src/lib/supabase/queries/payouts.ts`
+  - [x] Extend `getWineryPickingList` in `virtualPallets.ts` to include payout status fields
+  - [x] Add `getPalletPayoutDetail(palletId)` for drill-down/audit view
+- [x] Update Winery Dashboard UI (AC: 5)
+  - [x] Add payout status column to the picking list table (`pending`, `processing`, `paid`, `failed`)
+  - [x] Add net payout KPI and fees KPI cards
+  - [x] Add retry action for `failed` payout rows (calls `process-pallet-payout`)
+- [x] Add payout reconciliation tests (AC: 3, 4, 6)
+  - [x] Test duplicate payout trigger race results in one transfer and one payout row
+  - [x] Test failed Stripe transfer marks row `failed` and allows retry
+  - [x] Test payout math: `gross = sum(captured authorizations)`, `net = gross - commission`
+  - [x] Test reconciliation query returns transfer id and linked authorization item rows
 
 ## Dev Notes
 

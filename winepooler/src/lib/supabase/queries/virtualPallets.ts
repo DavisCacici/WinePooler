@@ -57,7 +57,7 @@ export const getPalletsByArea = async (areaId: string): Promise<VirtualPallet[]>
 export const getOpenPalletForWinery = async (
   areaId: string,
   wineryId: string
-): Promise<VirtualPallet | null> => {
+): Promise<VirtualPallet> => {
   const { data, error } = await supabase
     .from('virtual_pallets')
     .select('id, area_id, winery_id, state, bottle_count, threshold, created_by')
@@ -67,7 +67,7 @@ export const getOpenPalletForWinery = async (
     .maybeSingle()
 
   if (error) throw error
-  return data
+  return data as VirtualPallet
 }
 
 export const createVirtualPallet = async (payload: {
@@ -84,7 +84,7 @@ export const createVirtualPallet = async (payload: {
     .single()
 
   if (error) throw error
-  return data
+  return data as VirtualPallet
 }
 
 export const getPalletById = async (palletId: string): Promise<VirtualPallet | null> => {
@@ -157,6 +157,9 @@ export interface PickingListRow {
   wine_label: string | null
   total_stock: number | null
   allocated_bottles: number | null
+  payout_status: string | null
+  payout_net_cents: number | null
+  payout_commission_cents: number | null
 }
 
 export const getWineryPickingList = async (wineryProfileId: string): Promise<PickingListRow[]> => {
@@ -165,10 +168,11 @@ export const getWineryPickingList = async (wineryProfileId: string): Promise<Pic
     .select(`
       id, state, bottle_count, threshold,
       macro_areas(name),
-      wine_inventory(total_stock, allocated_bottles, wine_label)
+      wine_inventory(total_stock, allocated_bottles, wine_label),
+      pallet_payouts(status, net_amount_cents, commission_amount_cents)
     `)
     .eq('winery_id', wineryProfileId)
-    .in('state', ['open', 'frozen'])
+    .in('state', ['open', 'frozen', 'completed'])
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -182,5 +186,8 @@ export const getWineryPickingList = async (wineryProfileId: string): Promise<Pic
     wine_label: row.wine_inventory?.wine_label ?? null,
     total_stock: row.wine_inventory?.total_stock ?? null,
     allocated_bottles: row.wine_inventory?.allocated_bottles ?? null,
+    payout_status: row.pallet_payouts?.[0]?.status ?? null,
+    payout_net_cents: row.pallet_payouts?.[0]?.net_amount_cents ?? null,
+    payout_commission_cents: row.pallet_payouts?.[0]?.commission_amount_cents ?? null,
   }))
 }
