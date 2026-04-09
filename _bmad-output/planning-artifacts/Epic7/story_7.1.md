@@ -1,6 +1,6 @@
 # Story 7.1: Selling Unit Schema and Configuration API
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -19,26 +19,26 @@ so that I can configure how my products are sold.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create DB migration for `selling_units` table (AC: #1, #3)
-  - [ ] Define table with all columns, CHECK constraints, FK to winery_profiles
-  - [ ] Add RLS policies: SELECT for authenticated, INSERT/UPDATE/DELETE for owning winery
-  - [ ] Enable Realtime on the table
-- [ ] Task 2: Create DB migration for `product_selling_units` table (AC: #2, #4)
-  - [ ] Define table with FK to wine_inventory and selling_units
-  - [ ] Add UNIQUE constraint on (inventory_id, selling_unit_id)
-  - [ ] Add RLS policies with ownership check via join
-  - [ ] Enable Realtime on the table
-- [ ] Task 3: Create TypeScript query module (AC: #5)
-  - [ ] Create `src/lib/supabase/queries/sellingUnits.ts`
-  - [ ] Define `SellingUnit` and `ProductSellingUnit` interfaces
-  - [ ] Implement `getSellingUnitsByWinery(wineryId)` — returns all selling units for a winery
-  - [ ] Implement `upsertSellingUnit(unit)` — create or update a selling unit
-  - [ ] Implement `deleteSellingUnit(unitId)` — delete a selling unit
-  - [ ] Implement `getProductSellingUnits(inventoryId)` — returns enabled/disabled units for a product
-  - [ ] Implement `toggleProductSellingUnit(inventoryId, sellingUnitId, enabled)` — enable/disable a unit for a product
-- [ ] Task 4: Create unit tests (AC: #6)
-  - [ ] Create `src/lib/supabase/queries/__tests__/sellingUnits.test.ts`
-  - [ ] Test each query function with mocked Supabase client
+- [x] Task 1: Create DB migration for `selling_units` table (AC: #1, #3)
+  - [x] Define table with all columns, CHECK constraints, FK to winery_profiles
+  - [x] Add RLS policies: SELECT for authenticated, INSERT/UPDATE/DELETE for owning winery
+  - [x] Enable Realtime on the table
+- [x] Task 2: Create DB migration for `product_selling_units` table (AC: #2, #4)
+  - [x] Define table with FK to wine_inventory and selling_units
+  - [x] Add UNIQUE constraint on (inventory_id, selling_unit_id)
+  - [x] Add RLS policies with ownership check via join
+  - [x] Enable Realtime on the table
+- [x] Task 3: Create TypeScript query module (AC: #5)
+  - [x] Create `src/lib/supabase/queries/sellingUnits.ts`
+  - [x] Define `SellingUnit` and `ProductSellingUnit` interfaces
+  - [x] Implement `getSellingUnitsByWinery(wineryId)` — returns all selling units for a winery
+  - [x] Implement `upsertSellingUnit(unit)` — create or update a selling unit
+  - [x] Implement `deleteSellingUnit(unitId)` — delete a selling unit
+  - [x] Implement `getProductSellingUnits(inventoryId)` — returns enabled/disabled units for a product
+  - [x] Implement `toggleProductSellingUnit(inventoryId, sellingUnitId, enabled)` — enable/disable a unit for a product
+- [x] Task 4: Create unit tests (AC: #6)
+  - [x] Create `src/lib/supabase/queries/__tests__/sellingUnits.test.ts`
+  - [x] Test each query function with mocked Supabase client
 
 ## Dev Notes
 
@@ -108,9 +108,20 @@ Follow patterns from `buyerProfile.test.ts` and `macroAreas.test.ts`:
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
 
 ### Completion Notes List
+- Created `selling_units` table migration with CHECK constraints for unit_type discrimination, RLS policies following role-based pattern (TO winery), and Realtime enabled
+- Created `product_selling_units` join table migration with UNIQUE constraint, ownership-based RLS via join to selling_units → winery_profiles, and Realtime enabled
+- Created `sellingUnits.ts` query module with CRUD functions: getSellingUnitsByWinery, upsertSellingUnit, deleteSellingUnit, getProductSellingUnits, toggleProductSellingUnit, getEnabledSellingUnitsForProduct
+- Created comprehensive unit tests covering all query functions with success/error/empty cases
+- Used timestamps 20260409005000 and 20260409006000 to avoid conflicts with existing migrations
+- All RLS policies follow the latest comprehensive_rls pattern with role-based enforcement (TO winery)
 
 ### File List
+- winepooler/supabase/migrations/20260409005000_create_selling_units.sql (new)
+- winepooler/supabase/migrations/20260409006000_create_product_selling_units.sql (new)
+- winepooler/src/lib/supabase/queries/sellingUnits.ts (new)
+- winepooler/src/lib/supabase/queries/__tests__/sellingUnits.test.ts (new)

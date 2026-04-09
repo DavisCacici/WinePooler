@@ -31,3 +31,17 @@ export const getInventoryByPallet = async (palletId: string): Promise<WineInvent
     available_stock: inv.total_stock - inv.allocated_bottles,
   }
 }
+
+export const getWineryInventory = async (wineryId: string): Promise<WineInventory[]> => {
+  const { data, error } = await supabase
+    .from('wine_inventory')
+    .select('*')
+    .eq('winery_id', wineryId)
+    .order('wine_label')
+
+  if (error) throw error
+  return (data ?? []).map((inv: any) => ({
+    ...inv,
+    available_stock: inv.total_stock - inv.allocated_bottles,
+  }))
+}

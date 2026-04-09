@@ -1,6 +1,6 @@
 # Story 7.2: Selling Unit Configuration UI
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -22,30 +22,30 @@ so that I can define my available selling units visually.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create SellingUnitConfig component (AC: #1, #2, #3, #4)
-  - [ ] Create `src/pages/winery/SellingUnitConfig.tsx`
-  - [ ] Build Case configuration block: enable toggle + bottles_per_case number input
-  - [ ] Build Pallet configuration block: enable toggle + composition_type dropdown + quantity input
-  - [ ] Display a summary line showing the bottle equivalent (e.g., "1 pallet = 60 cases × 6 bottles = 360 bottles")
-- [ ] Task 2: Wire data loading and saving (AC: #5, #6, #8)
-  - [ ] On mount, call `getSellingUnitsByWinery(wineryProfileId)` and populate form state
-  - [ ] On save, call `upsertSellingUnit()` for each enabled unit type
-  - [ ] Call `deleteSellingUnit()` for disabled unit types that previously existed
-  - [ ] Show inline success/error feedback message after save
-- [ ] Task 3: Add form validation (AC: #7)
-  - [ ] Validate bottles_per_case ≥ 2 when case is enabled
-  - [ ] Validate pallet quantity ≥ 1 when pallet is enabled
-  - [ ] Prevent pallet with composition_type='cases' if case unit is not enabled
-  - [ ] Disable Save button when form is invalid
-- [ ] Task 4: Integrate into WineryDashboard (AC: #1)
-  - [ ] Import and render `SellingUnitConfig` in `WineryDashboard.tsx` below the picking list section
-  - [ ] Pass `wineryProfileId` as prop
-- [ ] Task 5: Create unit tests (AC: #9)
-  - [ ] Create `src/pages/winery/__tests__/SellingUnitConfig.test.tsx`
-  - [ ] Test initial render with empty state
-  - [ ] Test pre-populated form from existing data
-  - [ ] Test validation error states
-  - [ ] Test save success flow
+- [x] Task 1: Create SellingUnitConfig component (AC: #1, #2, #3, #4)
+  - [x] Create `src/pages/winery/SellingUnitConfig.tsx`
+  - [x] Build Case configuration block: enable toggle + bottles_per_case number input
+  - [x] Build Pallet configuration block: enable toggle + composition_type dropdown + quantity input
+  - [x] Display a summary line showing the bottle equivalent (e.g., "1 pallet = 60 cases × 6 bottles = 360 bottles")
+- [x] Task 2: Wire data loading and saving (AC: #5, #6, #8)
+  - [x] On mount, call `getSellingUnitsByWinery(wineryProfileId)` and populate form state
+  - [x] On save, call `upsertSellingUnit()` for each enabled unit type
+  - [x] Call `deleteSellingUnit()` for disabled unit types that previously existed
+  - [x] Show inline success/error feedback message after save
+- [x] Task 3: Add form validation (AC: #7)
+  - [x] Validate bottles_per_case ≥ 2 when case is enabled
+  - [x] Validate pallet quantity ≥ 1 when pallet is enabled
+  - [x] Prevent pallet with composition_type='cases' if case unit is not enabled
+  - [x] Disable Save button when form is invalid
+- [x] Task 4: Integrate into WineryDashboard (AC: #1)
+  - [x] Import and render `SellingUnitConfig` in `WineryDashboard.tsx` below the picking list section
+  - [x] Pass `wineryProfileId` as prop
+- [x] Task 5: Create unit tests (AC: #9)
+  - [x] Create `src/pages/winery/__tests__/SellingUnitConfig.test.tsx`
+  - [x] Test initial render with empty state
+  - [x] Test pre-populated form from existing data
+  - [x] Test validation error states
+  - [x] Test save success flow
 
 ## Dev Notes
 
@@ -124,9 +124,20 @@ Follow patterns from `BuyerProfileForm.test.tsx` and `BuyerDashboard.test.tsx`:
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
 
 ### Completion Notes List
+- Created SellingUnitConfig component with controlled form (useState), useEffect for data loading, case/pallet toggle blocks
+- Implemented inline validation: bottles_per_case ≥ 2, pallet_quantity ≥ 1, pallet composition_type=cases requires case enabled
+- Added bottle equivalent summary display for pallet configuration
+- Save flow: upserts enabled units, deletes disabled units that previously existed, refreshes cache, shows feedback
+- Integrated into WineryDashboard below picking list section, passes wineryProfileId prop
+- Tests cover: empty state, pre-populated form, validation errors, save success, save error, bottle equivalent summary
+- Design tokens follow existing WineryDashboard patterns (rounded-3xl, ring-1, amber-600 accent)
 
 ### File List
+- winepooler/src/pages/winery/SellingUnitConfig.tsx (new)
+- winepooler/src/pages/winery/__tests__/SellingUnitConfig.test.tsx (new)
+- winepooler/src/pages/dashboards/WineryDashboard.tsx (modified — added import + render of SellingUnitConfig)

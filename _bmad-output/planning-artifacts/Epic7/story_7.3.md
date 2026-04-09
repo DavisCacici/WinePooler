@@ -1,6 +1,6 @@
 # Story 7.3: Per-Product Selling Unit Assignment
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -21,31 +21,31 @@ so that different labels can have different packaging options.
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Create ProductUnitSettings component (AC: #1, #2, #3)
-  - [ ] Create `src/pages/winery/ProductUnitSettings.tsx`
-  - [ ] On mount, fetch winery's wine inventory via `getWineryInventory(wineryId)` (add this query if not existing)
-  - [ ] On mount, fetch winery's selling units via `getSellingUnitsByWinery(wineryId)`
-  - [ ] On mount, fetch all product_selling_units for each product
-  - [ ] Render a table: columns = Wine Label | SKU | Bottle | Case | Pallet (dynamic based on defined units)
-  - [ ] Each unit column shows a toggle switch reflecting enabled state
-- [ ] Task 2: Implement toggle interaction (AC: #4, #5)
-  - [ ] On toggle change, call `toggleProductSellingUnit(inventoryId, sellingUnitId, newEnabled)`
-  - [ ] Count currently enabled units for the product; if only 1 remains enabled, disable its toggle and show tooltip
-  - [ ] Optimistic UI update: toggle state changes immediately, reverts on error
-- [ ] Task 3: Handle default assignment for new selling units (AC: #6)
-  - [ ] Create a DB trigger or handle in application layer: when a new `selling_units` row is inserted, create `product_selling_units` rows for all existing `wine_inventory` items of that winery with `enabled: true`
-  - [ ] Preferred approach: SQL trigger function in migration to keep DB consistent
-- [ ] Task 4: Add buyer-side query filter (AC: #7)
-  - [ ] Update or create a query function `getEnabledSellingUnitsForProduct(inventoryId)` that returns only enabled selling units
-  - [ ] This function will be consumed by Epic 8 stories — for now, ensure the query exists and is tested
-- [ ] Task 5: Integrate into WineryDashboard (AC: #1)
-  - [ ] Import and render `ProductUnitSettings` in `WineryDashboard.tsx` below the SellingUnitConfig section
-  - [ ] Pass `wineryProfileId` as prop
-- [ ] Task 6: Create unit tests (AC: #8)
-  - [ ] Create `src/pages/winery/__tests__/ProductUnitSettings.test.tsx`
-  - [ ] Test table renders with correct products and toggle states
-  - [ ] Test toggle fires `toggleProductSellingUnit` with correct params
-  - [ ] Test last-unit guard prevents disabling
+- [x] Task 1: Create ProductUnitSettings component (AC: #1, #2, #3)
+  - [x] Create `src/pages/winery/ProductUnitSettings.tsx`
+  - [x] On mount, fetch winery's wine inventory via `getWineryInventory(wineryId)` (add this query if not existing)
+  - [x] On mount, fetch winery's selling units via `getSellingUnitsByWinery(wineryId)`
+  - [x] On mount, fetch all product_selling_units for each product
+  - [x] Render a table: columns = Wine Label | SKU | Bottle | Case | Pallet (dynamic based on defined units)
+  - [x] Each unit column shows a toggle switch reflecting enabled state
+- [x] Task 2: Implement toggle interaction (AC: #4, #5)
+  - [x] On toggle change, call `toggleProductSellingUnit(inventoryId, sellingUnitId, newEnabled)`
+  - [x] Count currently enabled units for the product; if only 1 remains enabled, disable its toggle and show tooltip
+  - [x] Optimistic UI update: toggle state changes immediately, reverts on error
+- [x] Task 3: Handle default assignment for new selling units (AC: #6)
+  - [x] Create a DB trigger or handle in application layer: when a new `selling_units` row is inserted, create `product_selling_units` rows for all existing `wine_inventory` items of that winery with `enabled: true`
+  - [x] Preferred approach: SQL trigger function in migration to keep DB consistent
+- [x] Task 4: Add buyer-side query filter (AC: #7)
+  - [x] Update or create a query function `getEnabledSellingUnitsForProduct(inventoryId)` that returns only enabled selling units
+  - [x] This function will be consumed by Epic 8 stories — for now, ensure the query exists and is tested
+- [x] Task 5: Integrate into WineryDashboard (AC: #1)
+  - [x] Import and render `ProductUnitSettings` in `WineryDashboard.tsx` below the SellingUnitConfig section
+  - [x] Pass `wineryProfileId` as prop
+- [x] Task 6: Create unit tests (AC: #8)
+  - [x] Create `src/pages/winery/__tests__/ProductUnitSettings.test.tsx`
+  - [x] Test table renders with correct products and toggle states
+  - [x] Test toggle fires `toggleProductSellingUnit` with correct params
+  - [x] Test last-unit guard prevents disabling
 
 ## Dev Notes
 
@@ -158,9 +158,24 @@ Same design tokens as WineryDashboard and SellingUnitConfig (Story 7.2):
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
 
 ### Completion Notes List
+- Created ProductUnitSettings component: loads inventory + selling units + product_selling_units, builds cross-join table
+- Implemented optimistic toggle interaction with revert on error
+- Last-unit guard: disables toggle and shows tooltip when only 1 unit type remains enabled
+- Created auto_assign_selling_unit_to_products trigger function (SECURITY DEFINER) — fires AFTER INSERT on selling_units
+- Added getWineryInventory query to existing wineInventory.ts (fetches all wine_inventory for a winery)
+- getEnabledSellingUnitsForProduct already implemented in sellingUnits.ts (Story 7.1) — returns only enabled selling units via join
+- Integrated ProductUnitSettings below SellingUnitConfig in WineryDashboard
+- Tests cover: empty states (no units / no inventory), table rendering with toggle states, toggle interaction, last-unit guard
+- Edge cases handled: empty inventory, empty selling units, products with no product_selling_units rows (default to enabled)
 
 ### File List
+- winepooler/src/pages/winery/ProductUnitSettings.tsx (new)
+- winepooler/src/pages/winery/__tests__/ProductUnitSettings.test.tsx (new)
+- winepooler/supabase/migrations/20260409007000_auto_assign_selling_units_trigger.sql (new)
+- winepooler/src/lib/supabase/queries/wineInventory.ts (modified — added getWineryInventory)
+- winepooler/src/pages/dashboards/WineryDashboard.tsx (modified — added import + render of ProductUnitSettings)

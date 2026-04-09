@@ -3,6 +3,8 @@ import { useAuth } from '../../lib/supabase/AuthContext'
 import { getWineryPickingList, type PickingListRow } from '../../lib/supabase/queries/virtualPallets'
 import { confirmPalletFulfillment, retryPalletPayout } from '../../lib/supabase/queries/payouts'
 import { supabase } from '../../lib/supabase/client'
+import SellingUnitConfig from '../winery/SellingUnitConfig'
+import ProductUnitSettings from '../winery/ProductUnitSettings'
 
 const formatEur = (cents: number) =>
   new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(cents / 100)
@@ -229,6 +231,14 @@ const WineryDashboard = () => {
             )}
           </article>
         </section>
+
+        {wineryProfileId && (
+          <SellingUnitConfig wineryProfileId={wineryProfileId} />
+        )}
+
+        {wineryProfileId && (
+          <ProductUnitSettings wineryProfileId={wineryProfileId} />
+        )}
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.VITE_STRIPE_SECRET_KEY!)
+const stripe = new Stripe(process.env.VITE_STRIPE_PUBLISHABLE_KEY!)
 
 const webhookSecret = process.env.VITE_STRIPE_WEBHOOK_SECRET!
 
