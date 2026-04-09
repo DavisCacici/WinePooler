@@ -1,14 +1,11 @@
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Stripe from 'npm:stripe@18.4.0'
+import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
-  apiVersion: '2025-04-30.basil',
-})
+const stripe = new Stripe(process.env.VITE_STRIPE_SECRET_KEY!)
 
-const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET')!
+const webhookSecret = process.env.VITE_STRIPE_WEBHOOK_SECRET!
 
-serve(async (req: Request) => {
+export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 })
   }
@@ -31,8 +28,8 @@ serve(async (req: Request) => {
     }
 
     const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      process.env.VITE_SUPABASE_URL!,
+      process.env.VITE_SUPABASE_SECRET_KEY!,
     )
 
     // 2. Handle relevant events
@@ -75,4 +72,4 @@ serve(async (req: Request) => {
     console.error('stripe-webhook error:', err)
     return new Response('Internal server error', { status: 500 })
   }
-})
+}

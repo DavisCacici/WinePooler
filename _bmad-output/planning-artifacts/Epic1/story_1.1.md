@@ -56,6 +56,24 @@ so that I can access the platform.
 
 Grok Code Fast 1
 
+### Review Findings
+
+- [ ] [Review][Decision] Role options mismatch: AC specifies Winery/Restaurateur/Sommelier but code implements Buyer/Winery — AC violation or intentional product evolution? [Register.tsx, auth.ts]
+- [ ] [Review][Patch] Register.tsx labels missing `htmlFor`/`id` association — breaks accessibility and label-based selectors [Register.tsx:63-93]
+- [ ] [Review][Patch] Navigation uses `<a href>` instead of React Router `<Link>` — causes full page reloads in SPA [Register.tsx:108, Home.tsx:10-13]
+- [ ] [Review][Patch] Email validation trivially bypassed — `includes('@')` accepts "@" or "a@" [Register.tsx:18]
+- [ ] [Review][Patch] VAT field accepts whitespace-only strings — no `.trim()` before check [Register.tsx:25]
+- [ ] [Review][Patch] Register catches `err: any` — Login correctly uses `err: unknown` with `instanceof Error` [Register.tsx:43]
+- [ ] [Review][Patch] Register error `<p>` missing `role="alert"` — Login has it, Register doesn't [Register.tsx:99]
+- [ ] [Review][Patch] No `if (loading) return` guard against double-submit in handlers [Register.tsx:34, Login.tsx:34]
+- [x] [Review][Defer] Supabase client init crashes on missing env vars [client.ts:3-4] — deferred, pre-existing
+- [x] [Review][Defer] Password policy weak (6-char min, no complexity) [Register.tsx:22] — deferred, Supabase server-side is real enforcement
+- [x] [Review][Defer] Client-side role metadata trusted without server enforcement [auth.ts:24] — deferred, needs server-side RLS/claims
+- [x] [Review][Defer] Unknown role silently navigates to `/` on login [Login.tsx:42] — deferred, pre-existing
+- [x] [Review][Defer] Validation logic duplicated across Register/Login [Register.tsx:17, Login.tsx:20] — deferred, code quality
+- [x] [Review][Defer] Test coverage gaps: Login, auth.ts, role normalization untested — deferred, pre-existing
+- [x] [Review][Defer] ROLE_ROUTES typed as `Record<string, string>` instead of `Record<AppRole, string>` [Login.tsx:5] — deferred, type safety
+
 ### Debug Log References
 
 None

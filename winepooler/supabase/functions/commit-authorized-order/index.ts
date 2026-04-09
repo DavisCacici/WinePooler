@@ -1,17 +1,14 @@
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import Stripe from 'npm:stripe@18.4.0'
+import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
-  apiVersion: '2025-04-30.basil',
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req: Request) => {
+export default async function handler(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -27,8 +24,8 @@ serve(async (req: Request) => {
     }
 
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
+      process.env.VITE_SUPABASE_URL!,
+      process.env.VITE_SUPABASE_ANON_KEY!,
       { global: { headers: { Authorization: authHeader } } }
     )
 
@@ -71,8 +68,8 @@ serve(async (req: Request) => {
 
     // 4. Call the authorization-aware RPC using service-role client
     const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      process.env.VITE_SUPABASE_URL!,
+      process.env.VITE_SUPABASE_SECRET_KEY!,
     )
 
     const { data: rpcResult, error: rpcError } = await supabaseAdmin.rpc(
@@ -117,12 +114,12 @@ serve(async (req: Request) => {
     // 6. If pallet froze, trigger capture for all authorized payments
     if (rpcResult.new_state === 'frozen') {
       try {
-        const captureUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/capture-frozen-pallet-payments`
+        const captureUrl = `${process.env.VITE_SUPABASE_URL}/functions/v1/capture-frozen-pallet-payments`
         await fetch(captureUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+            'Authorization': `Bearer ${process.env.VITE_SUPABASE_SECRET_KEY}`,
           },
           body: JSON.stringify({ palletId }),
         })
@@ -151,4 +148,4 @@ serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
-})
+}
