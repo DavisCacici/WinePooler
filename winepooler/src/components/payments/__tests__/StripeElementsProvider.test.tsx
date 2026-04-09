@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import StripeElementsProvider from '../StripeElementsProvider'
 
 // Mock stripe client to test both configured and unconfigured states
 describe('StripeElementsProvider', () => {

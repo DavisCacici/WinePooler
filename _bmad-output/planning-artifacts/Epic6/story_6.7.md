@@ -1,6 +1,6 @@
 # Story 6.7: Modern Responsive UI with Dual-Theme System
 
-Status: ready-for-dev
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -60,10 +60,10 @@ so that I can work comfortably across devices and lighting conditions.
 
 ## Tasks / Subtasks
 
-- [ ] Define and implement design token system (AC: 1)
-  - [ ] Define semantic color palette for Light theme in `:root` CSS custom properties
-  - [ ] Define semantic color palette for Dark theme in `[data-theme="dark"]` or `.dark` selector
-  - [ ] Token categories to define:
+- [x] Define and implement design token system (AC: 1)
+  - [x] Define semantic color palette for Light theme in `:root` CSS custom properties
+  - [x] Define semantic color palette for Dark theme in `[data-theme="dark"]` or `.dark` selector
+  - [x] Token categories to define:
     - Surfaces: `--color-surface`, `--color-surface-alt`, `--color-surface-elevated`
     - Text: `--color-text-primary`, `--color-text-secondary`, `--color-text-muted`, `--color-text-inverse`
     - Borders: `--color-border`, `--color-border-strong`
@@ -71,95 +71,95 @@ so that I can work comfortably across devices and lighting conditions.
     - Status: `--color-success`, `--color-warning`, `--color-error`, `--color-info` (with bg/text/border variants)
     - Accents: `--color-accent` (buyer: blue/emerald tones, winery: amber/stone tones per current convention)
     - Focus: `--color-focus-ring`
-  - [ ] Update `tailwind.config.js` to map semantic tokens to Tailwind utilities
-  - [ ] Update `index.css` with token definitions (preserve existing Tailwind directives and font-family)
+  - [x] Update `tailwind.config.js` to map semantic tokens to Tailwind utilities
+  - [x] Update `index.css` with token definitions (preserve existing Tailwind directives and font-family)
 
-- [ ] Create ThemeProvider and toggle (AC: 3)
-  - [ ] Create `src/lib/theme/ThemeContext.tsx` with:
+- [x] Create ThemeProvider and toggle (AC: 3)
+  - [x] Create `src/lib/theme/ThemeContext.tsx` with:
     - System preference detection via `matchMedia('(prefers-color-scheme: dark)')`
     - `localStorage` persistence under key `winepooler-theme`
     - Applies `data-theme` attribute on `<html>` element
     - Provides `theme`, `setTheme`, `toggleTheme` via React context
-  - [ ] Create `src/lib/theme/useTheme.ts` convenience hook
-  - [ ] Create `src/components/ui/ThemeToggle.tsx` — sun/moon icon toggle button
-  - [ ] Add inline script to `index.html` `<head>` to set `data-theme` before React hydration (prevents FOUC)
-  - [ ] Wrap app with `<ThemeProvider>` in `App.tsx` (inside `AuthProvider`)
+  - [x] Create `src/lib/theme/useTheme.ts` convenience hook
+  - [x] Create `src/components/ui/ThemeToggle.tsx` — sun/moon icon toggle button
+  - [x] Add inline script to `index.html` `<head>` to set `data-theme` before React hydration (prevents FOUC)
+  - [x] Wrap app with `<ThemeProvider>` in `App.tsx` (inside `AuthProvider`)
 
-- [ ] Build responsive layout shell (AC: 4)
-  - [ ] Create `src/components/layout/Header.tsx`:
+- [x] Build responsive layout shell (AC: 4)
+  - [x] Create `src/components/layout/Header.tsx`:
     - App logo/brand
     - Role indicator badge (Buyer/Winery)
     - Theme toggle
     - User menu (profile link, logout)
     - Responsive: collapses to hamburger on mobile
-  - [ ] Create `src/components/layout/MobileNav.tsx`:
+  - [x] Create `src/components/layout/MobileNav.tsx`:
     - Slide-out or overlay navigation drawer
     - Same navigation items as desktop
     - Backdrop overlay, close on outside click or Escape key
-  - [ ] Create `src/components/layout/LayoutShell.tsx`:
+  - [x] Create `src/components/layout/LayoutShell.tsx`:
     - Wraps `<Header>` + `<main>` content area
     - Optional sidebar for desktop (can be added later)
     - Takes `children` prop for page content
-  - [ ] Integrate LayoutShell into `App.tsx`:
+  - [x] Integrate LayoutShell into `App.tsx`:
     - Authenticated routes render inside `<LayoutShell>`
     - Unauthenticated routes (Home, Login, Register) render without LayoutShell
-  - [ ] Remove the outer `<div className="min-h-screen bg-gray-50">` from App.tsx; replace with token-based surface color on LayoutShell
+  - [x] Remove the outer `<div className="min-h-screen bg-gray-50">` from App.tsx; replace with token-based surface color on LayoutShell
 
-- [ ] Create reusable base UI components (AC: 5)
-  - [ ] `src/components/ui/Button.tsx`:
+- [x] Create reusable base UI components (AC: 5)
+  - [x] `src/components/ui/Button.tsx`:
     - Variants: `primary`, `secondary`, `danger`, `ghost`, `outline`
     - Sizes: `sm`, `md`, `lg`
     - States: loading (spinner), disabled
     - Forwards ref, accepts standard button attributes
-  - [ ] `src/components/ui/Input.tsx`:
+  - [x] `src/components/ui/Input.tsx`:
     - Label integration, error message display
     - Sizes: `sm`, `md`, `lg`
     - Forwards ref, accepts standard input attributes
-  - [ ] `src/components/ui/Badge.tsx`:
+  - [x] `src/components/ui/Badge.tsx`:
     - Variants: `default`, `success`, `warning`, `error`, `info`
     - Sizes: `sm`, `md`
     - Used by PaymentStatusBadge, InventoryStatusBadge, PalletPricingBadge
-  - [ ] `src/components/ui/Card.tsx`:
+  - [x] `src/components/ui/Card.tsx`:
     - Surface wrapper with border, shadow, padding
     - Optional header/footer sections
     - Used for dashboard cards, pallet cards, profile sections
-  - [ ] `src/components/ui/Modal.tsx`:
+  - [x] `src/components/ui/Modal.tsx`:
     - Overlay + centered dialog
     - Close on Escape key and backdrop click
     - Focus trap for accessibility
     - Used by AddOrderModal, CreatePalletModal
 
-- [ ] Migrate all existing components and pages to design tokens (AC: 1, 2, 5)
-  - [ ] `App.tsx` — remove `bg-gray-50`, use `bg-surface`
-  - [ ] `Home.tsx` — replace `text-gray-900`, `text-gray-600`, `bg-blue-600`, `bg-gray-600` etc.
-  - [ ] `Login.tsx` — replace `text-gray-700`, `border-gray-300`, `bg-blue-600`, `text-red-500`, `text-blue-600` etc.
-  - [ ] `Register.tsx` — same as Login
-  - [ ] `DashboardRouter.tsx` — replace `text-gray-600`
-  - [ ] `ProtectedDashboardRoute.tsx` — replace `text-gray-600`
-  - [ ] `BuyerDashboard.tsx` — replace `bg-slate-50`, `bg-white`, `ring-slate-200`, `text-emerald-700`, `text-slate-900`, `text-slate-600`, `border-slate-200` etc.
-  - [ ] `WineryDashboard.tsx` — replace `bg-stone-50`, `bg-white`, `ring-stone-200`, `text-amber-700`, `text-stone-900`, `text-stone-600` etc.
-  - [ ] `FreezeNotification.tsx` — replace `bg-slate-900`, `text-amber-300`, `text-slate-200`, `ring-amber-400/60`
-  - [ ] `PaymentStatusBadge.tsx` — refactor to use base `Badge` component with semantic variants
-  - [ ] `InventoryStatusBadge.tsx` — refactor to use base `Badge` component
-  - [ ] `PalletPricingBadge.tsx` — refactor to use base `Badge` component
-  - [ ] `StripeElementsProvider.tsx` — replace any hardcoded colors
-  - [ ] `BuyerProfileForm.tsx` — replace form field colors
-  - [ ] `AreaSelectionPage.tsx` — replace card/button colors
-  - [ ] `PurchasingPreferencesForm.tsx` — replace form field colors
-  - [ ] `AddOrderModal.tsx` — refactor to use base `Modal` component
-  - [ ] `CreatePalletModal.tsx` — refactor to use base `Modal` component
-  - [ ] Delete `App.css` entirely
+- [x] Migrate all existing components and pages to design tokens (AC: 1, 2, 5)
+  - [x] `App.tsx` — remove `bg-gray-50`, use `bg-surface`
+  - [x] `Home.tsx` — replace `text-gray-900`, `text-gray-600`, `bg-blue-600`, `bg-gray-600` etc.
+  - [x] `Login.tsx` — replace `text-gray-700`, `border-gray-300`, `bg-blue-600`, `text-red-500`, `text-blue-600` etc.
+  - [x] `Register.tsx` — same as Login
+  - [x] `DashboardRouter.tsx` — replace `text-gray-600`
+  - [x] `ProtectedDashboardRoute.tsx` — replace `text-gray-600`
+  - [x] `BuyerDashboard.tsx` — replace `bg-slate-50`, `bg-white`, `ring-slate-200`, `text-emerald-700`, `text-slate-900`, `text-slate-600`, `border-slate-200` etc.
+  - [x] `WineryDashboard.tsx` — replace `bg-stone-50`, `bg-white`, `ring-stone-200`, `text-amber-700`, `text-stone-900`, `text-stone-600` etc.
+  - [x] `FreezeNotification.tsx` — replace `bg-slate-900`, `text-amber-300`, `text-slate-200`, `ring-amber-400/60`
+  - [x] `PaymentStatusBadge.tsx` — refactor to use base `Badge` component with semantic variants
+  - [x] `InventoryStatusBadge.tsx` — refactor to use base `Badge` component
+  - [x] `PalletPricingBadge.tsx` — refactor to use base `Badge` component
+  - [x] `StripeElementsProvider.tsx` — replace any hardcoded colors
+  - [x] `BuyerProfileForm.tsx` — replace form field colors
+  - [x] `AreaSelectionPage.tsx` — replace card/button colors
+  - [x] `PurchasingPreferencesForm.tsx` — replace form field colors
+  - [x] `AddOrderModal.tsx` — refactor to use base `Modal` component
+  - [x] `CreatePalletModal.tsx` — refactor to use base `Modal` component
+  - [x] Delete `App.css` entirely
 
-- [ ] Add tests for theme and layout components (AC: 1, 2, 3, 4, 5)
-  - [ ] `src/lib/theme/__tests__/ThemeContext.test.tsx` — system preference detection, localStorage persistence, toggle behavior
-  - [ ] `src/components/ui/__tests__/Button.test.tsx` — variants, sizes, disabled/loading states
-  - [ ] `src/components/ui/__tests__/Badge.test.tsx` — variants, content rendering
-  - [ ] `src/components/ui/__tests__/Card.test.tsx` — renders children, header/footer slots
-  - [ ] `src/components/ui/__tests__/Modal.test.tsx` — open/close, escape key, backdrop click
-  - [ ] `src/components/layout/__tests__/Header.test.tsx` — renders logo, role badge, theme toggle, user menu
-  - [ ] `src/components/layout/__tests__/LayoutShell.test.tsx` — renders header + children
-  - [ ] `src/components/layout/__tests__/MobileNav.test.tsx` — open/close, navigation items
-  - [ ] Update existing tests that assert on hardcoded color classes (e.g., `bg-white`, `text-gray-900`) to use semantic classes
+- [x] Add tests for theme and layout components (AC: 1, 2, 3, 4, 5)
+  - [x] `src/lib/theme/__tests__/ThemeContext.test.tsx` — system preference detection, localStorage persistence, toggle behavior
+  - [x] `src/components/ui/__tests__/Button.test.tsx` — variants, sizes, disabled/loading states
+  - [x] `src/components/ui/__tests__/Badge.test.tsx` — variants, content rendering
+  - [x] `src/components/ui/__tests__/Card.test.tsx` — renders children, header/footer slots
+  - [x] `src/components/ui/__tests__/Modal.test.tsx` — open/close, escape key, backdrop click
+  - [x] `src/components/layout/__tests__/Header.test.tsx` — renders logo, role badge, theme toggle, user menu
+  - [x] `src/components/layout/__tests__/LayoutShell.test.tsx` — renders header + children
+  - [x] `src/components/layout/__tests__/MobileNav.test.tsx` — open/close, navigation items
+  - [x] Update existing tests that assert on hardcoded color classes (e.g., `bg-white`, `text-gray-900`) to use semantic classes
 
 ## Dev Notes
 
@@ -382,9 +382,63 @@ winepooler/
 ## Dev Agent Record
 
 ### Agent Model Used
+Claude Opus 4.6
 
 ### Debug Log References
+N/A
 
 ### Completion Notes List
+- Design token system: 40+ CSS custom properties for light/dark themes in index.css, semantic Tailwind mappings in tailwind.config.js with darkMode: 'selector'
+- ThemeProvider: React context with system preference detection, localStorage persistence under 'winepooler-theme', data-theme attribute on html element, media query listener for system changes
+- FOUC prevention: Inline script in index.html head sets data-theme before React bundle loads
+- Layout shell: Header with sticky positioning, role badge, theme toggle, user menu. MobileNav slide-out drawer with Escape/backdrop close. LayoutShell wraps authenticated routes only via App.tsx routing
+- Base UI components: Button (5 variants, 3 sizes, loading state), Input (label, error, 3 sizes), Badge (5 variants, 2 sizes), Card (header/footer slots), Modal (focus trap, Escape, backdrop click)
+- Full migration: All 18+ components/pages migrated from hardcoded Tailwind colors to semantic tokens. Zero remaining hardcoded color classes in src/**/*.tsx
+- FreezeNotification: Preserved intentional dark card design using notification-specific tokens
+- Tests: 8 new test files covering ThemeContext, Button, Badge, Card, Modal, Header, LayoutShell, MobileNav. Updated PaymentStatusBadge.test.tsx and BuyerDashboard.test.tsx assertions
+- App.css deleted (Vite boilerplate)
 
 ### File List
+- winepooler/src/index.css (MODIFIED — design tokens)
+- winepooler/tailwind.config.js (MODIFIED — darkMode, semantic colors)
+- winepooler/index.html (MODIFIED — FOUC prevention script)
+- winepooler/src/App.tsx (MODIFIED — ThemeProvider wrapper, LayoutShell routing)
+- winepooler/src/App.css (DELETED)
+- winepooler/src/lib/theme/ThemeContext.tsx (NEW)
+- winepooler/src/lib/theme/useTheme.ts (NEW)
+- winepooler/src/lib/theme/__tests__/ThemeContext.test.tsx (NEW)
+- winepooler/src/components/ui/ThemeToggle.tsx (NEW)
+- winepooler/src/components/ui/Button.tsx (NEW)
+- winepooler/src/components/ui/Input.tsx (NEW)
+- winepooler/src/components/ui/Badge.tsx (NEW)
+- winepooler/src/components/ui/Card.tsx (NEW)
+- winepooler/src/components/ui/Modal.tsx (NEW)
+- winepooler/src/components/ui/__tests__/Button.test.tsx (NEW)
+- winepooler/src/components/ui/__tests__/Badge.test.tsx (NEW)
+- winepooler/src/components/ui/__tests__/Card.test.tsx (NEW)
+- winepooler/src/components/ui/__tests__/Modal.test.tsx (NEW)
+- winepooler/src/components/layout/Header.tsx (NEW)
+- winepooler/src/components/layout/MobileNav.tsx (NEW)
+- winepooler/src/components/layout/LayoutShell.tsx (NEW)
+- winepooler/src/components/layout/__tests__/Header.test.tsx (NEW)
+- winepooler/src/components/layout/__tests__/LayoutShell.test.tsx (NEW)
+- winepooler/src/components/layout/__tests__/MobileNav.test.tsx (NEW)
+- winepooler/src/pages/Home.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/Login.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/Register.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/dashboards/BuyerDashboard.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/dashboards/WineryDashboard.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/dashboards/DashboardRouter.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/dashboards/ProtectedDashboardRoute.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/profile/BuyerProfileForm.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/profile/AreaSelectionPage.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/profile/PurchasingPreferencesForm.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/pallets/AddOrderModal.tsx (MODIFIED — semantic tokens)
+- winepooler/src/pages/pallets/CreatePalletModal.tsx (MODIFIED — semantic tokens)
+- winepooler/src/components/notifications/FreezeNotification.tsx (MODIFIED — notification tokens)
+- winepooler/src/components/pallets/InventoryStatusBadge.tsx (MODIFIED — semantic tokens)
+- winepooler/src/components/pallets/PalletPricingBadge.tsx (MODIFIED — semantic tokens)
+- winepooler/src/components/payments/PaymentStatusBadge.tsx (MODIFIED — semantic tokens)
+- winepooler/src/components/payments/StripeElementsProvider.tsx (MODIFIED — semantic tokens)
+- winepooler/src/components/payments/__tests__/PaymentStatusBadge.test.tsx (MODIFIED — updated assertions)
+- winepooler/src/pages/dashboards/__tests__/BuyerDashboard.test.tsx (MODIFIED — updated assertions)

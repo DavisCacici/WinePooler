@@ -10,7 +10,7 @@ const formatEur = (n: number) =>
 const PalletPricingBadge = ({ bulkPrice, retailPrice, compact = false }: PalletPricingBadgeProps) => {
   if (!bulkPrice) {
     return compact ? null : (
-      <p className="text-xs text-slate-400">Price TBD</p>
+      <p className="text-xs text-muted">Price TBD</p>
     )
   }
 
@@ -20,7 +20,7 @@ const PalletPricingBadge = ({ bulkPrice, retailPrice, compact = false }: PalletP
 
   if (compact) {
     return (
-      <p className="mt-1 text-xs font-semibold text-emerald-700">
+      <p className="mt-1 text-xs font-semibold text-accent-buyer">
         {formatEur(bulkPrice)}/bottle
       </p>
     )
@@ -29,16 +29,16 @@ const PalletPricingBadge = ({ bulkPrice, retailPrice, compact = false }: PalletP
   return (
     <div className="mt-3 space-y-1">
       <div className="flex items-center gap-2">
-        <span className="text-sm font-semibold text-emerald-700">{formatEur(bulkPrice)}</span>
-        <span className="text-xs text-slate-500">bulk / bottle</span>
+        <span className="text-sm font-semibold text-accent-buyer">{formatEur(bulkPrice)}</span>
+        <span className="text-xs text-muted">bulk / bottle</span>
         {savingPct && (
-          <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
+          <span className="rounded-full bg-success-bg px-2 py-0.5 text-xs font-medium text-success-text">
             -{savingPct}%
           </span>
         )}
       </div>
       {retailPrice && (
-        <p className="text-xs text-slate-400 line-through">
+        <p className="text-xs text-muted line-through">
           Retail {formatEur(retailPrice)}/bottle
         </p>
       )}

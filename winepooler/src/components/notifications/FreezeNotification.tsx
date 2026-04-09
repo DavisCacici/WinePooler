@@ -7,11 +7,11 @@ interface FreezeNotificationProps {
 const FreezeNotification = ({ wineryName, areaName, onDismiss }: FreezeNotificationProps) => (
   <div
     role="alert"
-    className="flex items-start gap-4 rounded-2xl bg-slate-900 px-5 py-4 text-white shadow-lg ring-1 ring-amber-400/60"
+    className="flex items-start gap-4 rounded-2xl bg-[var(--color-notification-surface)] px-5 py-4 text-[var(--color-notification-text)] shadow-lg ring-1 ring-[var(--color-notification-accent)]/60"
   >
     <div className="flex-1">
-      <p className="text-sm font-semibold text-amber-300">Pallet Frozen 🧊</p>
-      <p className="mt-1 text-sm text-slate-200">
+      <p className="text-sm font-semibold text-[var(--color-notification-accent)]">Pallet Frozen 🧊</p>
+      <p className="mt-1 text-sm opacity-80">
         Pallet for <span className="font-medium">{wineryName}</span> in{' '}
         <span className="font-medium">{areaName}</span> has been frozen!
       </p>
@@ -20,7 +20,7 @@ const FreezeNotification = ({ wineryName, areaName, onDismiss }: FreezeNotificat
       type="button"
       onClick={onDismiss}
       aria-label="Dismiss notification"
-      className="text-slate-400 hover:text-white"
+      className="text-muted hover:text-[var(--color-notification-text)]"
     >
       ×
     </button>

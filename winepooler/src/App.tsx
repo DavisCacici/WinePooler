@@ -10,21 +10,30 @@ import BuyerProfileForm from './pages/profile/BuyerProfileForm'
 import AreaSelectionPage from './pages/profile/AreaSelectionPage'
 import PurchasingPreferencesForm from './pages/profile/PurchasingPreferencesForm'
 import { AuthProvider } from './lib/supabase/AuthContext'
+import { ThemeProvider } from './lib/theme/ThemeContext'
+import LayoutShell from './components/layout/LayoutShell'
 
 const App = () => {
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-gray-50">
+    <ThemeProvider>
+      <AuthProvider>
         <Routes>
+          {/* Unauthenticated routes — no layout shell */}
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+
+          {/* Dashboard router */}
           <Route path="/dashboard" element={<DashboardRouter />} />
+
+          {/* Authenticated routes — wrapped in LayoutShell */}
           <Route
             path="/dashboard/buyer"
             element={
               <ProtectedDashboardRoute allowedRole="buyer">
-                <BuyerDashboard />
+                <LayoutShell>
+                  <BuyerDashboard />
+                </LayoutShell>
               </ProtectedDashboardRoute>
             }
           />
@@ -32,7 +41,9 @@ const App = () => {
             path="/dashboard/winery"
             element={
               <ProtectedDashboardRoute allowedRole="winery">
-                <WineryDashboard />
+                <LayoutShell>
+                  <WineryDashboard />
+                </LayoutShell>
               </ProtectedDashboardRoute>
             }
           />
@@ -40,7 +51,9 @@ const App = () => {
             path="/profile/complete"
             element={
               <ProtectedDashboardRoute allowedRole="buyer">
-                <BuyerProfileForm mode="complete" />
+                <LayoutShell>
+                  <BuyerProfileForm mode="complete" />
+                </LayoutShell>
               </ProtectedDashboardRoute>
             }
           />
@@ -48,7 +61,9 @@ const App = () => {
             path="/profile/edit"
             element={
               <ProtectedDashboardRoute allowedRole="buyer">
-                <BuyerProfileForm mode="edit" />
+                <LayoutShell>
+                  <BuyerProfileForm mode="edit" />
+                </LayoutShell>
               </ProtectedDashboardRoute>
             }
           />
@@ -56,7 +71,9 @@ const App = () => {
             path="/profile/area"
             element={
               <ProtectedDashboardRoute allowedRole="buyer">
-                <AreaSelectionPage />
+                <LayoutShell>
+                  <AreaSelectionPage />
+                </LayoutShell>
               </ProtectedDashboardRoute>
             }
           />
@@ -64,13 +81,15 @@ const App = () => {
             path="/profile/preferences"
             element={
               <ProtectedDashboardRoute allowedRole="buyer">
-                <PurchasingPreferencesForm />
+                <LayoutShell>
+                  <PurchasingPreferencesForm />
+                </LayoutShell>
               </ProtectedDashboardRoute>
             }
           />
         </Routes>
-      </div>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 

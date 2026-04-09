@@ -12,7 +12,7 @@ const ProtectedDashboardRoute = ({ allowedRole, children }: ProtectedDashboardRo
   const { loading, user, role } = useAuth()
 
   if (loading) {
-    return <div className="flex min-h-screen items-center justify-center text-gray-600">Loading dashboard...</div>
+    return <div className="flex min-h-screen items-center justify-center text-secondary bg-surface-alt">Loading dashboard...</div>
   }
 
   if (!user) {

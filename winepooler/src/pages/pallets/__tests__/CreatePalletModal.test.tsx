@@ -61,6 +61,12 @@ describe('CreatePalletModal', () => {
       bottle_count: 0,
       threshold: 600,
       created_by: 'buyer-1',
+      bulk_price_per_bottle: null,
+      retail_price_per_bottle: null,
+      inventory_id: null,
+      available_stock: null,
+      total_stock: null,
+      allocated_bottles: null,
     })
 
     renderModal()

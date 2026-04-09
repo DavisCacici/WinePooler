@@ -117,8 +117,8 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="text-slate-600">Loading profile…</p>
+      <div className="flex min-h-screen items-center justify-center bg-surface-alt">
+        <p className="text-secondary">Loading profile…</p>
       </div>
     )
   }
@@ -130,20 +130,20 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
       : 'Update your company details below.'
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-8">
+    <div className="px-6 py-8">
       <div className="mx-auto max-w-2xl">
-        <div className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+        <div className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">
             {mode === 'complete' ? 'Profile Setup' : 'Profile Settings'}
           </p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900">{title}</h1>
-          <p className="mt-2 text-slate-600">{subtitle}</p>
+          <h1 className="mt-3 text-3xl font-bold text-primary">{title}</h1>
+          <p className="mt-2 text-secondary">{subtitle}</p>
 
           <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-6">
             {/* Company Name */}
             <div>
-              <label htmlFor="company_name" className="block text-sm font-medium text-slate-700">
-                Company Name <span className="text-red-500">*</span>
+              <label htmlFor="company_name" className="block text-sm font-medium text-secondary">
+                Company Name <span className="text-error">*</span>
               </label>
               <input
                 id="company_name"
@@ -153,12 +153,12 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 onChange={handleChange}
                 aria-describedby={errors.company_name ? 'company_name-error' : undefined}
                 aria-invalid={!!errors.company_name}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                  errors.company_name ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'
+                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
+                  errors.company_name ? 'border-error bg-error-bg' : 'border-border bg-surface'
                 }`}
               />
               {errors.company_name && (
-                <p id="company_name-error" role="alert" className="mt-1 text-sm text-red-600">
+                <p id="company_name-error" role="alert" className="mt-1 text-sm text-error">
                   {errors.company_name}
                 </p>
               )}
@@ -166,8 +166,8 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
             {/* VAT Number */}
             <div>
-              <label htmlFor="vat_number" className="block text-sm font-medium text-slate-700">
-                VAT Number <span className="text-red-500">*</span>
+              <label htmlFor="vat_number" className="block text-sm font-medium text-secondary">
+                VAT Number <span className="text-error">*</span>
               </label>
               <input
                 id="vat_number"
@@ -177,12 +177,12 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 onChange={handleChange}
                 aria-describedby={errors.vat_number ? 'vat_number-error' : undefined}
                 aria-invalid={!!errors.vat_number}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                  errors.vat_number ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'
+                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
+                  errors.vat_number ? 'border-error bg-error-bg' : 'border-border bg-surface'
                 }`}
               />
               {errors.vat_number && (
-                <p id="vat_number-error" role="alert" className="mt-1 text-sm text-red-600">
+                <p id="vat_number-error" role="alert" className="mt-1 text-sm text-error">
                   {errors.vat_number}
                 </p>
               )}
@@ -190,8 +190,8 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
             {/* Address Street */}
             <div>
-              <label htmlFor="address_street" className="block text-sm font-medium text-slate-700">
-                Street Address <span className="text-red-500">*</span>
+              <label htmlFor="address_street" className="block text-sm font-medium text-secondary">
+                Street Address <span className="text-error">*</span>
               </label>
               <input
                 id="address_street"
@@ -201,12 +201,12 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 onChange={handleChange}
                 aria-describedby={errors.address_street ? 'address_street-error' : undefined}
                 aria-invalid={!!errors.address_street}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                  errors.address_street ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'
+                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
+                  errors.address_street ? 'border-error bg-error-bg' : 'border-border bg-surface'
                 }`}
               />
               {errors.address_street && (
-                <p id="address_street-error" role="alert" className="mt-1 text-sm text-red-600">
+                <p id="address_street-error" role="alert" className="mt-1 text-sm text-error">
                   {errors.address_street}
                 </p>
               )}
@@ -214,8 +214,8 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
             {/* Address City */}
             <div>
-              <label htmlFor="address_city" className="block text-sm font-medium text-slate-700">
-                City <span className="text-red-500">*</span>
+              <label htmlFor="address_city" className="block text-sm font-medium text-secondary">
+                City <span className="text-error">*</span>
               </label>
               <input
                 id="address_city"
@@ -225,12 +225,12 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 onChange={handleChange}
                 aria-describedby={errors.address_city ? 'address_city-error' : undefined}
                 aria-invalid={!!errors.address_city}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                  errors.address_city ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'
+                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
+                  errors.address_city ? 'border-error bg-error-bg' : 'border-border bg-surface'
                 }`}
               />
               {errors.address_city && (
-                <p id="address_city-error" role="alert" className="mt-1 text-sm text-red-600">
+                <p id="address_city-error" role="alert" className="mt-1 text-sm text-error">
                   {errors.address_city}
                 </p>
               )}
@@ -238,8 +238,8 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
             {/* Country */}
             <div>
-              <label htmlFor="address_country" className="block text-sm font-medium text-slate-700">
-                Country <span className="text-red-500">*</span>
+              <label htmlFor="address_country" className="block text-sm font-medium text-secondary">
+                Country <span className="text-error">*</span>
               </label>
               <input
                 id="address_country"
@@ -249,12 +249,12 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 onChange={handleChange}
                 aria-describedby={errors.address_country ? 'address_country-error' : undefined}
                 aria-invalid={!!errors.address_country}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                  errors.address_country ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white'
+                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
+                  errors.address_country ? 'border-error bg-error-bg' : 'border-border bg-surface'
                 }`}
               />
               {errors.address_country && (
-                <p id="address_country-error" role="alert" className="mt-1 text-sm text-red-600">
+                <p id="address_country-error" role="alert" className="mt-1 text-sm text-error">
                   {errors.address_country}
                 </p>
               )}
@@ -262,7 +262,7 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
             {/* Phone (optional) */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="phone" className="block text-sm font-medium text-secondary">
                 Phone
               </label>
               <input
@@ -271,12 +271,12 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 type="tel"
                 value={fields.phone}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="mt-1 block w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus"
               />
             </div>
 
             {submitError && (
-              <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+              <p role="alert" className="rounded-xl bg-error-bg px-4 py-3 text-sm text-error">
                 {submitError}
               </p>
             )}
@@ -286,7 +286,7 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
                 <button
                   type="button"
                   onClick={() => navigate('/dashboard/buyer')}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-6 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                  className="rounded-full border border-border bg-surface-alt px-6 py-2.5 text-sm font-medium text-secondary hover:bg-surface-elevated"
                 >
                   Cancel
                 </button>
@@ -294,7 +294,7 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+                className="rounded-full bg-accent-buyer px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
               >
                 {submitting ? 'Saving…' : mode === 'complete' ? 'Save & Continue' : 'Save Changes'}
               </button>

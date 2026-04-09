@@ -46,12 +46,12 @@ const AreaSelectionPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-8">
+    <div className="px-6 py-8">
       <div className="mx-auto max-w-4xl space-y-8">
-        <header className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">Area Selection</p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900">Choose your macro-area</h1>
-          <p className="mt-2 text-slate-600">
+        <header className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">Area Selection</p>
+          <h1 className="mt-3 text-3xl font-bold text-primary">Choose your macro-area</h1>
+          <p className="mt-2 text-secondary">
             Select the territory where your business operates. Your dashboard will show pallets and wineries from this area.
           </p>
         </header>
@@ -59,10 +59,10 @@ const AreaSelectionPage = () => {
         {loading ? (
           <section className="grid gap-4 md:grid-cols-2" aria-label="area-loading-skeleton">
             {[1, 2, 3].map(item => (
-              <div key={item} className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 animate-pulse">
-                <div className="h-4 w-32 rounded bg-slate-200" />
-                <div className="mt-3 h-3 w-full rounded bg-slate-200" />
-                <div className="mt-2 h-3 w-4/5 rounded bg-slate-200" />
+              <div key={item} className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border animate-pulse">
+                <div className="h-4 w-32 rounded bg-surface-elevated" />
+                <div className="mt-3 h-3 w-full rounded bg-surface-elevated" />
+                <div className="mt-2 h-3 w-4/5 rounded bg-surface-elevated" />
               </div>
             ))}
           </section>
@@ -77,11 +77,11 @@ const AreaSelectionPage = () => {
                   type="button"
                   onClick={() => handleAreaSelect(area.id)}
                   disabled={Boolean(submittingAreaId)}
-                  className="rounded-3xl bg-white p-6 text-left shadow-sm ring-1 ring-slate-200 transition hover:ring-emerald-300 disabled:opacity-70"
+                  className="rounded-3xl bg-surface p-6 text-left shadow-sm ring-1 ring-border transition hover:ring-accent-buyer disabled:opacity-70"
                 >
-                  <p className="text-sm font-semibold uppercase tracking-[0.15em] text-emerald-700">{area.name}</p>
-                  <p className="mt-2 text-slate-600">{area.description ?? 'No description available.'}</p>
-                  <p className="mt-4 text-sm font-medium text-slate-900">
+                  <p className="text-sm font-semibold uppercase tracking-[0.15em] text-accent-buyer">{area.name}</p>
+                  <p className="mt-2 text-secondary">{area.description ?? 'No description available.'}</p>
+                  <p className="mt-4 text-sm font-medium text-primary">
                     {isSubmitting ? 'Saving selection...' : 'Select this area'}
                   </p>
                 </button>
@@ -91,13 +91,13 @@ const AreaSelectionPage = () => {
         )}
 
         {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-4" role="alert">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="rounded-2xl border border-error-border bg-error-bg p-4" role="alert">
+            <p className="text-sm text-error">{error}</p>
             {!loading && (
               <button
                 type="button"
                 onClick={loadAreas}
-                className="mt-3 rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-700"
+                className="mt-3 rounded-full border border-error-border bg-surface px-4 py-2 text-sm font-medium text-error"
               >
                 Retry
               </button>

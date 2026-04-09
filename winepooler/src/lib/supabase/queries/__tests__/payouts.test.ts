@@ -4,9 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const mockSelect = vi.fn()
 const mockEq = vi.fn()
 const mockOrder = vi.fn()
-const mockMaybeSingle = vi.fn()
 
-vi.mock('../client', () => ({
+vi.mock('../../client', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: mockSelect,
@@ -23,8 +22,8 @@ vi.mock('../client', () => ({
 import {
   getWineryPayouts,
   getPalletPayoutDetail,
-} from '../queries/payouts'
-import { supabase } from '../client'
+} from '../payouts'
+import { supabase } from '../../client'
 
 describe('payouts queries', () => {
   beforeEach(() => {

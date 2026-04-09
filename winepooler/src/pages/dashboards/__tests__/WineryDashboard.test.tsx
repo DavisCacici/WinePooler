@@ -20,7 +20,7 @@ const mockFrom = vi.fn(() => ({ select: mockSelect }))
 
 vi.mock('../../../lib/supabase/client', () => ({
   supabase: {
-    from: (...args: unknown[]) => mockFrom(...args),
+    from: () => mockFrom(),
   },
 }))
 
@@ -37,10 +37,12 @@ const makePicking = (overrides: Partial<virtualPalletQueries.PickingListRow> = {
   bottle_count: 120,
   allocated_bottles: 80,
   total_stock: 120,
+  threshold: 0,
   state: 'frozen' as const,
   payout_status: null,
   payout_net_cents: null,
   payout_commission_cents: null,
+  wine_label: null,
   ...overrides,
 })
 

@@ -64,7 +64,26 @@ describe('Register', () => {
 
   it('submits form successfully', async () => {
     const mockRegisterUser = vi.mocked(registerUser)
-    mockRegisterUser.mockResolvedValue({ user: { id: '1' } })
+    mockRegisterUser.mockResolvedValue({
+      user: {
+        id: '1',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
+        email: 'test@example.com',
+        // phone: null,
+        // confirmed_at: null,
+        // email_confirmed_at: null,
+        // phone_confirmed_at: null,
+        // last_sign_in_at: null,
+        // role: null,
+        identities: [],
+        factors: [],
+        // banned_until: null
+      },
+      session: null
+    })
 
     render(
       <BrowserRouter>

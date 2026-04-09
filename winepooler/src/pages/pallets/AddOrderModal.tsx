@@ -52,7 +52,7 @@ interface PaymentFormProps {
 const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentFormProps) => {
   const stripe = useStripe()
   const elements = useElements()
-
+  console.log('Rendering PaymentForm with pallet:', buyerUserId);
   const [step, setStep] = useState<'order_details' | 'payment_details'>('order_details')
   const [flowState, setFlowState] = useState<PaymentFlowState>('order_details')
   const [quantity, setQuantity] = useState('')
@@ -197,44 +197,44 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
       aria-modal="true"
       aria-labelledby="add-order-title"
     >
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg ring-1 ring-slate-200">
-        <h2 id="add-order-title" className="text-xl font-bold text-slate-900">
+      <div className="w-full max-w-md rounded-3xl bg-surface p-8 shadow-lg ring-1 ring-border">
+        <h2 id="add-order-title" className="text-xl font-bold text-primary">
           Add Order
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-secondary">
           {step === 'order_details'
             ? 'Submit your bottle order for this pallet.'
             : 'Enter your payment details to authorize the hold.'}
         </p>
 
         {/* Step indicator */}
-        <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
-          <span className={step === 'order_details' ? 'font-semibold text-emerald-700' : 'text-emerald-600'}>
+        <div className="mt-3 flex items-center gap-2 text-xs text-muted">
+          <span className={step === 'order_details' ? 'font-semibold text-accent-buyer' : 'text-accent-buyer opacity-70'}>
             1. Order details
           </span>
           <span>→</span>
-          <span className={step === 'payment_details' ? 'font-semibold text-emerald-700' : ''}>
+          <span className={step === 'payment_details' ? 'font-semibold text-accent-buyer' : ''}>
             2. Payment
           </span>
         </div>
 
         {/* Pallet context */}
-        <div className="mt-5 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+        <div className="mt-5 rounded-2xl bg-surface-alt p-4 ring-1 ring-border">
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent-buyer">
             {pallet.winery_name ?? 'Unknown winery'}
           </p>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-secondary">
             {pallet.bottle_count} / {pallet.threshold} bottles
           </p>
-          <div className="mt-2 h-2 rounded-full bg-slate-200">
+          <div className="mt-2 h-2 rounded-full bg-surface-elevated">
             <div
-              className="h-2 rounded-full bg-emerald-600 transition-all"
+              className="h-2 rounded-full bg-accent-buyer transition-all"
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <p className="mt-1 text-xs text-slate-500">{progressPct}% full</p>
+          <p className="mt-1 text-xs text-muted">{progressPct}% full</p>
           {hasPricing && (
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-muted">
               Price per bottle: {formatCentsToEur(pallet.bulk_price_per_bottle! * 100)}
             </p>
           )}
@@ -244,7 +244,7 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
         {step === 'order_details' && (
           <form onSubmit={handleProceedToPayment} noValidate className="mt-6 space-y-4">
             <div>
-              <label htmlFor="order-quantity" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="order-quantity" className="block text-sm font-medium text-secondary">
                 Quantity (bottles) <span aria-hidden="true">*</span>
               </label>
               <input
@@ -254,55 +254,55 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
                 step="1"
                 value={quantity}
                 onChange={handleQuantityChange}
-                className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-primary bg-surface focus:border-accent-buyer focus:outline-none focus:ring-1 focus:ring-focus"
                 placeholder="e.g. 12"
                 aria-describedby={quantityError ? 'quantity-error' : undefined}
                 aria-invalid={quantityError ? 'true' : 'false'}
               />
               {quantityError && (
-                <p id="quantity-error" role="alert" className="mt-1 text-xs text-red-600">
+                <p id="quantity-error" role="alert" className="mt-1 text-xs text-error">
                   {quantityError}
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="order-wine-label" className="block text-sm font-medium text-slate-700">
-                Wine label <span className="text-slate-400">(optional)</span>
+              <label htmlFor="order-wine-label" className="block text-sm font-medium text-secondary">
+                Wine label <span className="text-muted">(optional)</span>
               </label>
               <input
                 id="order-wine-label"
                 type="text"
                 value={wineLabel}
                 onChange={e => setWineLabel(e.target.value)}
-                className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-primary bg-surface focus:border-accent-buyer focus:outline-none focus:ring-1 focus:ring-focus"
                 placeholder="e.g. Barolo Riserva 2019"
               />
             </div>
 
             <div>
-              <label htmlFor="order-notes" className="block text-sm font-medium text-slate-700">
-                Notes <span className="text-slate-400">(optional)</span>
+              <label htmlFor="order-notes" className="block text-sm font-medium text-secondary">
+                Notes <span className="text-muted">(optional)</span>
               </label>
               <textarea
                 id="order-notes"
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
                 rows={2}
-                className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                className="mt-1 w-full rounded-xl border border-border px-3 py-2 text-sm text-primary bg-surface focus:border-accent-buyer focus:outline-none focus:ring-1 focus:ring-focus"
                 placeholder="Any special requirements..."
               />
             </div>
 
             {submitError && (
-              <p role="alert" className="text-sm text-red-600">
+              <p role="alert" className="text-sm text-error">
                 {submitError}
               </p>
             )}
 
             {/* Amount preview */}
             {hasPricing && quantity && !validateQuantity(quantity) && (
-              <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">
+              <div className="rounded-xl bg-success-bg p-3 text-sm text-success-text">
                 Authorization amount:{' '}
                 <span className="font-semibold">
                   {formatCentsToEur(computeAmountCents(Number(quantity), pallet.bulk_price_per_bottle!))}
@@ -315,14 +315,14 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40"
+                className="flex-1 rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-secondary hover:bg-surface-elevated disabled:opacity-40"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading || !hasPricing}
-                className="flex-1 rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-40"
+                className="flex-1 rounded-full bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40"
               >
                 {loading ? 'Preparing…' : 'Continue to Payment'}
               </button>
@@ -334,25 +334,25 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
         {step === 'payment_details' && (
           <form onSubmit={handlePaymentAndCommit} noValidate className="mt-6 space-y-4">
             {/* Order summary */}
-            <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-700">
+            <div className="rounded-xl bg-surface-alt p-3 text-sm text-secondary">
               <p>
                 <span className="font-medium">{quantity} bottles</span>
-                {wineLabel && <span className="text-slate-500"> — {wineLabel}</span>}
+                {wineLabel && <span className="text-muted"> — {wineLabel}</span>}
               </p>
-              <p className="mt-1 font-semibold text-emerald-700">
+              <p className="mt-1 font-semibold text-accent-buyer">
                 Hold amount: {formatCentsToEur(amountCents)}
               </p>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-muted">
                 Funds will be held but not charged until the pallet freezes.
               </p>
             </div>
 
             {/* Stripe CardElement */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-secondary mb-2">
                 Card details
               </label>
-              <div className="rounded-xl border border-slate-300 px-3 py-3">
+              <div className="rounded-xl border border-border px-3 py-3">
                 <CardElement
                   options={{
                     style: {
@@ -370,18 +370,18 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
 
             {/* Flow status messages */}
             {flowState === 'authorizing' && (
-              <p className="text-sm text-amber-600">Authorizing payment…</p>
+              <p className="text-sm text-warning">Authorizing payment…</p>
             )}
             {flowState === 'committing' && (
-              <p className="text-sm text-amber-600">Confirming order…</p>
+              <p className="text-sm text-warning">Confirming order…</p>
             )}
             {flowState === 'conflict' && (
-              <p role="alert" className="text-sm text-red-600">
+              <p role="alert" className="text-sm text-error">
                 {submitError}
               </p>
             )}
             {flowState === 'payment_failed' && submitError && (
-              <p role="alert" className="text-sm text-red-600">
+              <p role="alert" className="text-sm text-error">
                 {submitError}
               </p>
             )}
@@ -397,14 +397,14 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
                   setPaymentIntentId(null)
                 }}
                 disabled={loading}
-                className="flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-40"
+                className="flex-1 rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-secondary hover:bg-surface-elevated disabled:opacity-40"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={loading || !stripe || !elements}
-                className="flex-1 rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-40"
+                className="flex-1 rounded-full bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40"
               >
                 {loading ? 'Processing…' : 'Authorize & Submit'}
               </button>

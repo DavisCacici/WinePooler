@@ -9,7 +9,7 @@ interface StripeElementsProviderProps {
 
 const StripeElementsProvider = ({ children, clientSecret }: StripeElementsProviderProps) => {
   if (!stripePromise) {
-    return <div className="p-4 text-sm text-red-600">Stripe is not configured. Check VITE_STRIPE_PUBLISHABLE_KEY.</div>
+    return <div className="p-4 text-sm text-error">Stripe is not configured. Check VITE_STRIPE_PUBLISHABLE_KEY.</div>
   }
 
   const options = clientSecret ? { clientSecret } : undefined

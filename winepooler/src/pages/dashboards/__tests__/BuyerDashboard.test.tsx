@@ -132,6 +132,12 @@ describe('BuyerDashboard - profile completion guard', () => {
         created_by: 'user-1',
         area_name: 'North Milan',
         winery_name: 'Cantina Aurora',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null
       },
       {
         id: 'pal-2',
@@ -143,6 +149,12 @@ describe('BuyerDashboard - profile completion guard', () => {
         created_by: 'user-2',
         area_name: 'North Milan',
         winery_name: 'Tenuta Collina',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null
       },
     ])
 
@@ -163,7 +175,7 @@ describe('BuyerDashboard - profile completion guard', () => {
     expect(mockNavigate).not.toHaveBeenCalledWith('/profile/area')
 
     const preferredCard = screen.getByText('Cantina Aurora').closest('article')
-    expect(preferredCard).toHaveClass('ring-2', 'ring-emerald-500')
+    expect(preferredCard).toHaveClass('ring-2', 'ring-accent-buyer')
   })
 
   it('shows set preferences prompt when preferences do not exist', async () => {
@@ -252,6 +264,12 @@ describe('BuyerDashboard - Add Order button state', () => {
         created_by: 'user-1',
         area_name: 'North Milan',
         winery_name: 'Cantina Aurora',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null
       },
     ])
 
@@ -281,6 +299,12 @@ describe('BuyerDashboard - Add Order button state', () => {
         created_by: 'user-1',
         area_name: 'North Milan',
         winery_name: 'Cantina Aurora',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null
       },
     ])
 
@@ -310,6 +334,12 @@ describe('BuyerDashboard - Add Order button state', () => {
         created_by: 'user-1',
         area_name: 'North Milan',
         winery_name: 'Cantina Aurora',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null,
       },
     ])
 
@@ -370,6 +400,13 @@ describe('BuyerDashboard - Add Order button state', () => {
         created_by: 'user-1',
         area_name: 'North Milan',
         winery_name: 'Cantina Aurora',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null,
+
       },
     ])
     vi.mocked(virtualPalletQueries.buyerHasOrderOnPallet).mockResolvedValue(true)
@@ -411,6 +448,12 @@ describe('BuyerDashboard - Add Order button state', () => {
         created_by: 'user-1',
         area_name: 'North Milan',
         winery_name: 'Cantina Aurora',
+        bulk_price_per_bottle: null,
+        retail_price_per_bottle: null,
+        inventory_id: null,
+        available_stock: null,
+        total_stock: null,
+        allocated_bottles: null,
       },
     ])
     vi.mocked(virtualPalletQueries.buyerHasOrderOnPallet).mockResolvedValue(false)

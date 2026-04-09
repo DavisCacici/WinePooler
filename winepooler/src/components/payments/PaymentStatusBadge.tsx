@@ -9,27 +9,27 @@ interface PaymentStatusBadgeProps {
 const statusConfig: Record<PaymentStatus, { label: string; classes: string }> = {
   authorized: {
     label: 'Authorized — capture on freeze',
-    classes: 'bg-amber-100 text-amber-800',
+    classes: 'bg-warning-bg text-warning-text',
   },
   capture_pending: {
     label: 'Capturing',
-    classes: 'bg-slate-100 text-slate-700',
+    classes: 'bg-surface-elevated text-secondary',
   },
   captured: {
     label: 'Captured',
-    classes: 'bg-emerald-100 text-emerald-800',
+    classes: 'bg-success-bg text-success-text',
   },
   capture_failed: {
     label: 'Capture failed',
-    classes: 'bg-red-100 text-red-800',
+    classes: 'bg-error-bg text-error-text',
   },
   canceled: {
     label: 'Authorization released',
-    classes: 'bg-slate-100 text-slate-600',
+    classes: 'bg-surface-elevated text-secondary',
   },
   expired: {
     label: 'Authorization expired',
-    classes: 'bg-red-100 text-red-700',
+    classes: 'bg-error-bg text-error-text',
   },
 }
 

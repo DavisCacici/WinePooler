@@ -58,8 +58,8 @@ describe('AreaSelectionPage', () => {
 
   it('loads and renders area cards', async () => {
     vi.mocked(macroAreaQueries.getMacroAreas).mockResolvedValue([
-      { id: '1', name: 'North Milan', slug: 'north-milan', description: 'North area', display_order: 1 },
-      { id: '2', name: 'Lake Garda', slug: 'lake-garda', description: 'Lake area', display_order: 2 },
+      { id: '1', name: 'North Milan', slug: 'north-milan', description: 'North area', display_order: 1, metadata: null },
+      { id: '2', name: 'Lake Garda', slug: 'lake-garda', description: 'Lake area', display_order: 2, metadata: null },
     ])
 
     renderPage()
@@ -70,7 +70,7 @@ describe('AreaSelectionPage', () => {
 
   it('updates buyer area and redirects to dashboard on selection', async () => {
     vi.mocked(macroAreaQueries.getMacroAreas).mockResolvedValue([
-      { id: '1', name: 'North Milan', slug: 'north-milan', description: 'North area', display_order: 1 },
+      { id: '1', name: 'North Milan', slug: 'north-milan', description: 'North area', display_order: 1, metadata: null },
     ])
     vi.mocked(buyerProfileQueries.updateBuyerArea).mockResolvedValue()
 

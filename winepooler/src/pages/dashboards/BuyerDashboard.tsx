@@ -322,21 +322,21 @@ const BuyerDashboard = () => {
     (preferences.preferred_wine_types.length > 0 || preferences.preferred_appellations.length > 0)
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-8">
+    <div className="px-6 py-8">
       <div className="mx-auto max-w-6xl space-y-8">
-        <header className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">
+        <header className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">
             Buyer Dashboard · {activeAreaName ?? 'All Areas'}
           </p>
           {hasPreferences && (
-            <span className="mt-3 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+            <span className="mt-3 inline-flex rounded-full border border-success-border bg-success-bg px-3 py-1 text-xs font-medium text-success-text">
               Preferences set
             </span>
           )}
           <div className="mt-3 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Map active pallets and switch to grid detail</h1>
-              <p className="mt-2 max-w-2xl text-slate-600">
+              <h1 className="text-3xl font-bold text-primary">Map active pallets and switch to grid detail</h1>
+              <p className="mt-2 max-w-2xl text-secondary">
                 Monitor area-wide demand, compare pallet progress, and move quickly from geography to order-ready inventory.
               </p>
             </div>
@@ -346,7 +346,7 @@ const BuyerDashboard = () => {
                   <Link
                     key={item}
                     to="/profile/preferences"
-                    className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700"
+                    className="rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-secondary"
                   >
                     {item}
                   </Link>
@@ -354,7 +354,7 @@ const BuyerDashboard = () => {
                   <a
                     key={item}
                     href="#"
-                    className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700"
+                    className="rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-secondary"
                   >
                     {item}
                   </a>
@@ -362,15 +362,15 @@ const BuyerDashboard = () => {
               ))}
               <Link
                 to="/profile/area"
-                className="rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700"
+                className="rounded-full border border-success-border bg-success-bg px-4 py-2 text-sm font-medium text-success-text"
               >
                 Change Area
               </Link>
             </nav>
           </div>
           {preferencesLoaded && preferences === null && (
-            <p className="mt-3 text-sm text-slate-600">
-              <Link to="/profile/preferences" className="text-emerald-700 underline">
+            <p className="mt-3 text-sm text-secondary">
+              <Link to="/profile/preferences" className="text-accent-buyer underline">
                 Set preferences
               </Link>{' '}
               to highlight matching pallets.
@@ -378,32 +378,32 @@ const BuyerDashboard = () => {
           )}
         </header>
 
-        <section className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <section className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">Pallet discovery</h2>
-              <p className="text-sm text-slate-600">Toggle between macro-area map view and pallet grid view.</p>
+              <h2 className="text-xl font-semibold text-primary">Pallet discovery</h2>
+              <p className="text-sm text-secondary">Toggle between macro-area map view and pallet grid view.</p>
             </div>
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                className="rounded-full bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
                 + New Pallet
               </button>
-              <div className="flex gap-2 rounded-full bg-slate-100 p-1">
+              <div className="flex gap-2 rounded-full bg-surface-alt p-1">
               <button
                 type="button"
                 onClick={() => setView('map')}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'map' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}
+                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'map' ? 'bg-surface text-primary shadow-sm' : 'text-secondary'}`}
               >
                 Map View
               </button>
               <button
                 type="button"
                 onClick={() => setView('grid')}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600'}`}
+                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'grid' ? 'bg-surface text-primary shadow-sm' : 'text-secondary'}`}
               >
                 Grid View
               </button>
@@ -411,23 +411,23 @@ const BuyerDashboard = () => {
             </div>
           </div>
 
-          {loadingPallets && <p className="mt-4 text-sm text-slate-600">Loading pallets...</p>}
+          {loadingPallets && <p className="mt-4 text-sm text-secondary">Loading pallets...</p>}
 
           {view === 'map' ? (
             <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-              <div className="rounded-3xl bg-gradient-to-br from-emerald-100 via-white to-cyan-100 p-6">
-                <h3 className="text-lg font-semibold text-slate-900">Map View</h3>
+              <div className="rounded-3xl bg-gradient-to-br from-success-bg via-surface to-info-bg p-6">
+                <h3 className="text-lg font-semibold text-primary">Map View</h3>
                 <div className="mt-5 grid gap-4 md:grid-cols-3">
                   {visiblePallets.map(pallet => (
                     <article
                       key={pallet.id}
-                      className={`rounded-2xl bg-white/90 p-4 shadow-sm ${
-                        isPalletPreferred(pallet, preferences) ? 'ring-2 ring-emerald-500' : ''
+                      className={`rounded-2xl bg-surface/90 p-4 shadow-sm ${
+                        isPalletPreferred(pallet, preferences) ? 'ring-2 ring-accent-buyer' : ''
                       }`}
                     >
-                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{pallet.area}</p>
-                      <p className="mt-2 text-base font-semibold text-slate-900">{pallet.winery}</p>
-                      <p className="mt-1 text-sm text-slate-600">Progress {pallet.progress}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-accent-buyer">{pallet.area}</p>
+                      <p className="mt-2 text-base font-semibold text-primary">{pallet.winery}</p>
+                      <p className="mt-1 text-sm text-secondary">Progress {pallet.progress}</p>
                       <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} compact />
                       <InventoryStatusBadge
                         availableStock={pallet.availableStock}
@@ -436,7 +436,7 @@ const BuyerDashboard = () => {
                         syncError={pallet.inventorySyncError}
                       />
                       {pallet.state !== 'open' && (
-                        <span className="mt-2 inline-block rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <span className="mt-2 inline-block rounded-full bg-surface-elevated px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-secondary">
                           {pallet.state}
                         </span>
                       )}
@@ -444,7 +444,7 @@ const BuyerDashboard = () => {
                         type="button"
                         disabled={pallet.state !== 'open' || (pallet.availableStock !== null && pallet.availableStock <= 0)}
                         onClick={() => setActivePalletForOrder(pallet)}
-                        className="mt-3 w-full rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="mt-3 w-full rounded-full bg-accent-buyer px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         Add Order
                       </button>
@@ -452,9 +452,9 @@ const BuyerDashboard = () => {
                   ))}
                 </div>
               </div>
-              <div className="rounded-3xl bg-slate-900 p-6 text-white">
+              <div className="rounded-3xl bg-[var(--color-notification-surface)] p-6 text-[var(--color-notification-text)]">
                 <h3 className="text-lg font-semibold">Area demand snapshot</h3>
-                <ul className="mt-4 space-y-3 text-sm text-slate-200">
+                <ul className="mt-4 space-y-3 text-sm opacity-80">
                   <li>North Milan demand spike: +18% week over week</li>
                   <li>Lake Garda pallet ETA: 2 days to freeze</li>
                   <li>Turin Center has the fastest fill velocity</li>
@@ -463,29 +463,29 @@ const BuyerDashboard = () => {
             </div>
           ) : (
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-slate-900">Grid View</h3>
+              <h3 className="text-lg font-semibold text-primary">Grid View</h3>
               <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {visiblePallets.map(pallet => (
                   <article
                     key={pallet.id}
-                    className={`rounded-2xl border border-slate-200 bg-slate-50 p-5 ${
-                      isPalletPreferred(pallet, preferences) ? 'ring-2 ring-emerald-500' : ''
+                    className={`rounded-2xl border border-border bg-surface-alt p-5 ${
+                      isPalletPreferred(pallet, preferences) ? 'ring-2 ring-accent-buyer' : ''
                     }`}
                   >
                     <div className="flex items-start justify-between">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{pallet.id}</p>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-accent-buyer">{pallet.id}</p>
                       {pallet.state !== 'open' && (
-                        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                        <span className="rounded-full bg-surface-elevated px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-secondary">
                           {pallet.state}
                         </span>
                       )}
                     </div>
-                    <h4 className="mt-2 text-lg font-semibold text-slate-900">{pallet.winery}</h4>
-                    <p className="mt-1 text-sm text-slate-600">{pallet.area}</p>
-                    <div className="mt-4 h-2 rounded-full bg-slate-200">
-                      <div className="h-2 rounded-full bg-emerald-600" style={{ width: pallet.progress }} />
+                    <h4 className="mt-2 text-lg font-semibold text-primary">{pallet.winery}</h4>
+                    <p className="mt-1 text-sm text-secondary">{pallet.area}</p>
+                    <div className="mt-4 h-2 rounded-full bg-surface-elevated">
+                      <div className="h-2 rounded-full bg-accent-buyer" style={{ width: pallet.progress }} />
                     </div>
-                    <p className="mt-3 text-sm text-slate-700">{pallet.bottles} bottles committed</p>
+                    <p className="mt-3 text-sm text-secondary">{pallet.bottles} bottles committed</p>
                     <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} />
                     <InventoryStatusBadge
                       availableStock={pallet.availableStock}
@@ -497,7 +497,7 @@ const BuyerDashboard = () => {
                       type="button"
                       disabled={pallet.state !== 'open' || (pallet.availableStock !== null && pallet.availableStock <= 0)}
                       onClick={() => setActivePalletForOrder(pallet)}
-                      className="mt-4 w-full rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="mt-4 w-full rounded-full bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Add Order
                     </button>

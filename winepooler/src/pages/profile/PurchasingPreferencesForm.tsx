@@ -162,61 +162,61 @@ const PurchasingPreferencesForm = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <p className="text-slate-600">Loading preferences...</p>
+      <div className="flex min-h-screen items-center justify-center bg-surface-alt">
+        <p className="text-secondary">Loading preferences...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-8">
+    <div className="px-6 py-8">
       <div className="mx-auto max-w-4xl space-y-8">
-        <header className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">Buyer Preferences</p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900">Purchasing preferences</h1>
-          <p className="mt-2 text-slate-600">
+        <header className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">Buyer Preferences</p>
+          <h1 className="mt-3 text-3xl font-bold text-primary">Purchasing preferences</h1>
+          <p className="mt-2 text-secondary">
             Set your preferred wine types, appellations, and monthly budget to personalize pallet discovery.
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="rounded-3xl bg-white p-8 shadow-sm ring-1 ring-slate-200 space-y-8">
+        <form onSubmit={handleSubmit} className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border space-y-8">
           <section>
-            <h2 className="text-lg font-semibold text-slate-900">Preferred wine types</h2>
+            <h2 className="text-lg font-semibold text-primary">Preferred wine types</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {WINE_TYPES.map(type => (
-                <label key={type} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <label key={type} className="flex items-center gap-3 rounded-2xl border border-border bg-surface-alt px-4 py-3">
                   <input
                     type="checkbox"
                     checked={preferredWineTypes.includes(type)}
                     onChange={() => toggleWineType(type)}
-                    className="h-4 w-4 rounded border-slate-300"
+                    className="h-4 w-4 rounded border-border-strong"
                   />
-                  <span className="text-sm font-medium text-slate-700">{type}</span>
+                  <span className="text-sm font-medium text-secondary">{type}</span>
                 </label>
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-slate-900">Preferred appellations</h2>
-            <p className="mt-1 text-sm text-slate-600">Add up to 10 tags. Press Enter or comma to add.</p>
+            <h2 className="text-lg font-semibold text-primary">Preferred appellations</h2>
+            <p className="mt-1 text-sm text-secondary">Add up to 10 tags. Press Enter or comma to add.</p>
             <input
               type="text"
               value={tagInput}
               onChange={event => setTagInput(event.target.value)}
               onKeyDown={handleTagInputKeyDown}
               placeholder="e.g. Barolo, Brunello"
-              className="mt-3 block w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="mt-3 block w-full rounded-xl border border-border px-4 py-2.5 text-primary bg-surface focus:outline-none focus:ring-2 focus:ring-focus"
             />
 
             <div className="mt-3 flex flex-wrap gap-2">
               {preferredAppellations.map(tag => (
-                <span key={tag} className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm text-emerald-700">
+                <span key={tag} className="inline-flex items-center gap-2 rounded-full bg-accent-buyer-bg px-3 py-1 text-sm text-accent-buyer-text">
                   {tag}
                   <button
                     type="button"
                     onClick={() => removeTag(tag)}
-                    className="rounded-full text-emerald-700 hover:text-emerald-900"
+                    className="rounded-full text-accent-buyer-text hover:opacity-70"
                     aria-label={`Remove ${tag}`}
                   >
                     x
@@ -227,10 +227,10 @@ const PurchasingPreferencesForm = () => {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-slate-900">Monthly budget range (EUR)</h2>
+            <h2 className="text-lg font-semibold text-primary">Monthly budget range (EUR)</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="budget-min" className="block text-sm font-medium text-slate-700">Minimum</label>
+                <label htmlFor="budget-min" className="block text-sm font-medium text-secondary">Minimum</label>
                 <input
                   id="budget-min"
                   type="number"
@@ -238,11 +238,11 @@ const PurchasingPreferencesForm = () => {
                   step="0.01"
                   value={budgetMin}
                   onChange={event => setBudgetMin(event.target.value)}
-                  className="mt-1 block w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="mt-1 block w-full rounded-xl border border-border px-4 py-2.5 text-primary bg-surface focus:outline-none focus:ring-2 focus:ring-focus"
                 />
               </div>
               <div>
-                <label htmlFor="budget-max" className="block text-sm font-medium text-slate-700">Maximum</label>
+                <label htmlFor="budget-max" className="block text-sm font-medium text-secondary">Maximum</label>
                 <input
                   id="budget-max"
                   type="number"
@@ -250,26 +250,26 @@ const PurchasingPreferencesForm = () => {
                   step="0.01"
                   value={budgetMax}
                   onChange={event => setBudgetMax(event.target.value)}
-                  className="mt-1 block w-full rounded-xl border border-slate-200 px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="mt-1 block w-full rounded-xl border border-border px-4 py-2.5 text-primary bg-surface focus:outline-none focus:ring-2 focus:ring-focus"
                 />
               </div>
             </div>
           </section>
 
           {budgetValidationError && (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            <p className="rounded-xl border border-error-border bg-error-bg px-4 py-3 text-sm text-error" role="alert">
               {budgetValidationError}
             </p>
           )}
 
           {error && (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+            <p className="rounded-xl border border-error-border bg-error-bg px-4 py-3 text-sm text-error" role="alert">
               {error}
             </p>
           )}
 
           {success && (
-            <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700" role="status">
+            <p className="rounded-xl border border-success-border bg-success-bg px-4 py-3 text-sm text-success-text" role="status">
               {success}
             </p>
           )}
@@ -278,7 +278,7 @@ const PurchasingPreferencesForm = () => {
             <button
               type="submit"
               disabled={saving || Boolean(budgetValidationError)}
-              className="rounded-full bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+              className="rounded-full bg-accent-buyer px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Preferences'}
             </button>
