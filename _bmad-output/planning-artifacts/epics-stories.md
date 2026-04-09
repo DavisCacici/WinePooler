@@ -1,8 +1,8 @@
 ---
 stepsCompleted: ["step-01-validate-prerequisites", "step-02-design-epics", "step-03-create-stories", "step-04-final-validation"]
-inputDocuments: ["prd.md"]
+inputDocuments: ["prd.md", "ux-design-specification.md"]
 lastEdited: "2026-04-09"
-editReason: "PRD v1.2 - Added selling unit configuration (FR10-FR15), new Epics 7-8"
+editReason: "Added Story 6.7 - Modern Responsive UI with Dual-Theme System (UX-DR4, UX-DR5, UX-DR6)"
 ---
 
 # WinePooler - Epic Breakdown
@@ -57,6 +57,9 @@ NFR3: Expansion of geographic clusters via configuration (scalability).
 UX-DR1: Buyer Dashboard with Map/Grid view of active pallets in geofenced area.
 UX-DR2: Buyer Area Configuration with geofenced Macro-Area selection and purchasing preference management.
 UX-DR3: Winery Portal with consolidated picking lists and revenue analytics.
+UX-DR4: Modern Responsive UI with mobile-first design, shared layout shell, and consistent component library across all views.
+UX-DR5: Dual-Theme System with professional Light and Dark themes using semantic design tokens and CSS custom properties.
+UX-DR6: Theme toggle with system preference detection, persistent user choice, and full coverage across all data-heavy screens.
 
 ### FR Coverage Map
 
@@ -65,7 +68,7 @@ Epic 2: FR2
 Epic 3: FR3, FR4, FR5, NFR1
 Epic 4: FR6, FR7
 Epic 5: FR8, FR9
-Epic 6: NFR2, NFR3, Additional Requirements, UX-DR1, UX-DR2, UX-DR3
+Epic 6: NFR2, NFR3, Additional Requirements, UX-DR1, UX-DR2, UX-DR3, UX-DR4, UX-DR5, UX-DR6
 Epic 7: FR10, FR11, FR12, FR13, FR14, UX-DR3 (selling unit config UI)
 Epic 8: FR15, FR4 (rework to winery-defined threshold), FR6 (rework to per-unit pricing)
 
@@ -369,6 +372,59 @@ So that the platform can expand.
 **When** I update configuration
 **Then** new clusters are added without code changes
 **And** performance is maintained
+
+### Story 6.7: Modern Responsive UI with Dual-Theme System
+
+As a platform user (Buyer or Winery),
+I want a beautiful, modern, and responsive interface with Light and Dark theme support,
+So that I can work comfortably across devices and lighting conditions.
+
+**Acceptance Criteria:**
+
+**Design Token System:**
+
+**Given** the platform uses Tailwind CSS
+**When** the design token system is implemented
+**Then** a semantic color palette is defined via CSS custom properties (e.g., `--color-primary`, `--color-surface`, `--color-text`, `--color-border`, `--color-accent`)
+**And** Tailwind is extended to reference these tokens (e.g., `bg-surface`, `text-primary`)
+**And** all existing hardcoded color classes (`bg-gray-50`, `bg-white`, `text-gray-900`, etc.) are replaced with semantic token classes
+
+**Dual-Theme Implementation:**
+
+**Given** the design tokens are in place
+**When** I toggle between Light and Dark themes
+**Then** all UI surfaces, text, borders, badges, progress bars, and interactive elements update correctly
+**And** Dark theme uses true dark colors (not simple inversion) optimized for data-heavy screens
+**And** Light theme maintains a clean, professional look with proper contrast ratios (WCAG AA minimum)
+**And** both themes render correctly across all existing views: dashboards, forms, modals, tables, and status badges
+
+**Theme Provider and Toggle:**
+
+**Given** I am on any page of the platform
+**When** the app loads
+**Then** the theme defaults to the user's system preference (`prefers-color-scheme`)
+**And** a theme toggle control is accessible from the layout header/navigation
+**And** my theme selection is persisted in `localStorage` and restored on subsequent visits
+**And** theme transitions are smooth (no flash of unstyled content on page load)
+
+**Responsive Layout Shell:**
+
+**Given** I access the platform from any device (desktop, tablet, mobile)
+**When** a page renders
+**Then** a shared layout shell is used with a persistent header/navigation and optional sidebar
+**And** navigation collapses to a hamburger menu on mobile viewports
+**And** all content areas, grids, tables, and forms adapt gracefully to screen width
+**And** touch targets meet minimum 44×44px on mobile devices
+**And** no horizontal scrolling occurs at any supported viewport width
+
+**Component Modernization:**
+
+**Given** the shared layout and theme system are in place
+**When** existing hand-written UI elements (buttons, inputs, badges, modals) are refactored
+**Then** a consistent set of reusable base components is created (Button, Input, Badge, Card, Modal)
+**And** all components support both Light and Dark themes via the design token system
+**And** visual consistency is maintained across Buyer and Winery views
+**And** the existing App.css Vite boilerplate is removed
 
 ## Epic 7: Winery Selling Unit Configuration
 
