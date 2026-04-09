@@ -1,6 +1,8 @@
 ---
-stepsCompleted: ["step-01-validate-prerequisites", "step-02-design-epics", "step-03-create-stories"]
+stepsCompleted: ["step-01-validate-prerequisites", "step-02-design-epics", "step-03-create-stories", "step-04-final-validation"]
 inputDocuments: ["prd.md"]
+lastEdited: "2026-04-09"
+editReason: "PRD v1.2 - Added selling unit configuration (FR10-FR15), new Epics 7-8"
 ---
 
 # WinePooler - Epic Breakdown
@@ -22,6 +24,12 @@ FR6: Dynamic Pricing display of Bulk Price vs. Retail Market Price.
 FR7: Real-time Inventory Sync from Supabase/PostgreSQL.
 FR8: Pre-authorization (Escrow) where funds are authorized on buyer's card but captured only when pallet reaches Frozen threshold.
 FR9: Bulk Payouts to wineries as single payment minus platform commission.
+FR10: Winery can offer products in three selling unit types: single bottle, case, and pallet.
+FR11: Winery defines a case by specifying the number of bottles it contains (e.g., 6, 12).
+FR12: Winery defines a pallet by specifying its composition — either a number of bottles or a number of cases.
+FR13: Each wine product listed by a winery can have its own selling unit settings (per-product configuration).
+FR14: Winery can enable or disable any of the three unit types per product (unit toggle).
+FR15: Configured selling units feed directly into Virtual Pallet threshold calculations (threshold linkage).
 
 ### NonFunctional Requirements
 
@@ -58,6 +66,8 @@ Epic 3: FR3, FR4, FR5, NFR1
 Epic 4: FR6, FR7
 Epic 5: FR8, FR9
 Epic 6: NFR2, NFR3, Additional Requirements, UX-DR1, UX-DR2, UX-DR3
+Epic 7: FR10, FR11, FR12, FR13, FR14, UX-DR3 (selling unit config UI)
+Epic 8: FR15, FR4 (rework to winery-defined threshold), FR6 (rework to per-unit pricing)
 
 ## Epic List
 
@@ -67,6 +77,8 @@ Epic 3: Virtual Pallet Pooling
 Epic 4: Smart Marketplace
 Epic 5: Financial Automation
 Epic 6: Platform Infrastructure and Deployment
+Epic 7: Winery Selling Unit Configuration
+Epic 8: Selling Unit Integration into Pooling & Marketplace
 
 ## Epic 1: User Authentication and Role Management
 
@@ -357,3 +369,102 @@ So that the platform can expand.
 **When** I update configuration
 **Then** new clusters are added without code changes
 **And** performance is maintained
+
+## Epic 7: Winery Selling Unit Configuration
+
+Wineries can define and manage their selling units (single bottle, case, pallet) per product, specifying bottle counts per case and composition per pallet, and toggling which units are available for each wine listing.
+
+### Story 7.1: Selling Unit Schema and Configuration API
+
+As a winery,
+I want the platform to support selling unit definitions (bottle, case, pallet),
+So that I can configure how my products are sold.
+
+**Acceptance Criteria:**
+
+**Given** a winery is authenticated
+**When** the selling_units and product_selling_units tables are created
+**Then** the schema supports three unit types: `bottle`, `case`, `pallet`
+**And** a case record stores a `bottles_per_case` integer (e.g., 6, 12)
+**And** a pallet record stores a `composition_type` (`bottles` or `cases`) and a `quantity` integer
+**And** RLS policies restrict access so wineries can only manage their own selling units
+
+### Story 7.2: Selling Unit Configuration UI
+
+As a winery operator,
+I want to access a Selling Unit Configuration section in my Winery Portal,
+So that I can define my available selling units visually.
+
+**Acceptance Criteria:**
+
+**Given** I am logged in as a winery
+**When** I navigate to the Selling Unit Configuration section
+**Then** I see a form to define a case (with a number input for bottles per case)
+**And** I see a form to define a pallet (with a dropdown for composition type and a quantity input)
+**And** I can save my selling unit definitions
+**And** saved definitions persist and display on subsequent visits
+
+### Story 7.3: Per-Product Selling Unit Assignment
+
+As a winery operator,
+I want to assign selling unit settings to each of my wine products individually,
+So that different labels can have different packaging options.
+
+**Acceptance Criteria:**
+
+**Given** I have defined selling units (case and/or pallet)
+**When** I edit a wine product listing
+**Then** I can toggle which unit types (bottle, case, pallet) are enabled for that product
+**And** each product can have different selling unit configurations
+**And** at least one unit type must remain enabled per product
+**And** the buyer-facing marketplace reflects only the enabled unit types for each product
+
+## Epic 8: Selling Unit Integration into Pooling & Marketplace
+
+Virtual Pallet thresholds, order placement, and marketplace pricing use winery-configured selling units instead of hardcoded values. Buyers see prices per unit type and progress bars expressed in the winery's chosen unit.
+
+### Story 8.1: Unit-Aware Virtual Pallet Thresholds
+
+As the system,
+I want pallet thresholds to be calculated from the winery's configured selling units,
+So that pallets freeze at the winery-defined quantity instead of a hardcoded 600 bottles.
+
+**Acceptance Criteria:**
+
+**Given** a winery has configured a pallet as 60 cases × 6 bottles
+**When** a virtual pallet is created for that winery
+**Then** the pallet threshold is set to 360 bottles (60 × 6)
+**And** the progress bar displays progress in the winery's configured unit (e.g., "42/60 cases")
+**And** the pallet freezes when the threshold is reached
+**And** the `add_order_with_authorization` RPC is updated to use the winery-defined threshold
+**And** if the winery later changes its selling unit config, existing open pallets retain their original threshold
+
+### Story 8.2: Unit-Aware Order Placement
+
+As a buyer,
+I want to place orders in the winery's configured selling units,
+So that I can order by bottle, case, or pallet as offered.
+
+**Acceptance Criteria:**
+
+**Given** a wine product has case and pallet enabled as selling units
+**When** I open the Add Order modal for that product
+**Then** I see a unit selector showing only enabled unit types
+**And** when I select "case", quantity is in cases and the bottle equivalent is displayed
+**And** the order is recorded with both the unit type, unit quantity, and bottle equivalent
+**And** the pallet progress updates by the bottle equivalent amount
+
+### Story 8.3: Per-Unit Dynamic Pricing
+
+As a buyer,
+I want to see bulk and retail prices per selling unit,
+So that I can compare value across unit types.
+
+**Acceptance Criteria:**
+
+**Given** a wine product has bottle, case, and pallet enabled
+**When** the product is displayed in the marketplace
+**Then** bulk price and retail price are shown for each enabled unit type
+**And** case price = bottle price × bottles_per_case (with optional case discount)
+**And** pallet price = unit price × pallet quantity (with optional pallet discount)
+**And** the pricing badge component displays the active unit's price

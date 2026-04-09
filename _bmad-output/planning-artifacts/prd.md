@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD): WinePooler
 
-**Version:** 1.1
+**Version:** 1.2
 
 **Status:** Draft
 
@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-WineSaaS is a B2B logistics and order aggregation platform designed for the wine industry. It solves the inefficiency of fragmented micro-orders by grouping demands from multiple HoReCa buyers (Restaurants, Hotels) and freelance Sommeliers into "Virtual Pallets." This allows wineries to process bulk shipments while buyers access wholesale pricing.
+WineSaaS is a B2B logistics and order aggregation platform designed for the wine industry. It solves the inefficiency of fragmented micro-orders by grouping demands from multiple HoReCa buyers (Restaurants, Hotels) and freelance Sommeliers into "Virtual Pallets." Wineries configure their own selling units — single bottles, cases (with a defined bottle count), or pallets (with a defined bottle or case count) — and the platform aggregates buyer demand against those units. This allows wineries to process bulk shipments while buyers access wholesale pricing.
 
 ## 2. Objectives & Success Metrics
 
@@ -32,13 +32,13 @@ WineSaaS is a B2B logistics and order aggregation platform designed for the wine
 
 ### 4.2. Geographic Pooling Engine
 
-- **Virtual Pallet Logic:** Orders are aggregated by Macro-Area and Winery.
-- **Threshold Management:** Pallets transition from `Open` to `Frozen` once the critical mass (e.g., 600 bottles) is met.
-- **Real-time Progress:** Live progress bars showing area-wide demand.
+- **Virtual Pallet Logic:** Orders are aggregated by Macro-Area and Winery, expressed in the winery's configured selling units (bottles, cases, or pallets).
+- **Threshold Management:** Pallets transition from `Open` to `Frozen` once the winery-defined threshold is met, calculated against the configured selling unit hierarchy (e.g., a pallet of 60 cases × 6 bottles = 360 bottles).
+- **Real-time Progress:** Live progress bars showing area-wide demand in the winery's configured selling unit.
 
 ### 4.3. Smart Marketplace
 
-- **Dynamic Pricing:** Display of "Bulk Price" vs. "Retail Market Price."
+- **Dynamic Pricing:** Display of "Bulk Price" vs. "Retail Market Price" per selling unit (bottle, case, pallet) as configured by each winery.
 - **Inventory Sync:** Real-time stock levels from Supabase/PostgreSQL.
 
 ### 4.4. Financial Automation (Fintech)
@@ -46,10 +46,19 @@ WineSaaS is a B2B logistics and order aggregation platform designed for the wine
 - **Pre-authorization (Escrow):** Funds are authorized on the buyer's card but only captured when the pallet hits the "Frozen" threshold.
 - **Bulk Payouts:** Wineries receive a single bulk payment minus the platform commission.
 
+### 4.5. Selling Unit Configuration
+
+- **Unit Types:** A winery can offer products in three selling unit types: **single bottle**, **case**, and **pallet**.
+- **Case Definition:** A winery defines a case by specifying the number of bottles it contains (e.g., 6, 12).
+- **Pallet Definition:** A winery defines a pallet by specifying its composition — either a number of bottles or a number of cases (e.g., 60 cases of 6 bottles, or 360 loose bottles).
+- **Per-Product Configuration:** Each wine product listed by a winery can have its own selling unit settings, enabling different packaging for different labels.
+- **Unit Toggle:** A winery can enable or disable any of the three unit types per product (e.g., offer only cases and pallets, not single bottles).
+- **Threshold Linkage:** The configured selling units feed directly into Virtual Pallet threshold calculations (see §4.2).
+
 ## 5. User Interface & Screen Requirements
 
 - **Buyer Dashboard:** Map/Grid view of active pallets in the geofenced area.
-- **Winery Portal:** Consolidated picking lists and revenue analytics.
+- **Winery Portal:** Consolidated picking lists, revenue analytics, and a **Selling Unit Configuration** interface where wineries define bottle counts per case, composition per pallet, and toggle available unit types per product.
 
 ## 6. Technical Specifications
 

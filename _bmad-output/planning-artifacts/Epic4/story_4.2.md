@@ -44,48 +44,48 @@ so that I know availability.
 
 ## Tasks / Subtasks
 
-- [ ] Create `wine_inventory` table in Supabase (AC: 1, 2, 3, 4, 6)
-  - [ ] Schema: `id`, `winery_id` (FK → winery_profiles), `wine_label` (text), `sku` (text, unique per winery), `total_stock` (integer CHECK ≥ 0), `allocated_bottles` (integer DEFAULT 0 CHECK ≥ 0), `updated_at`
-  - [ ] RLS: winery owner can INSERT/UPDATE own rows; authenticated users can SELECT all
-  - [ ] Seed 3 rows (one per mock winery: Cantina Aurora, Tenuta Collina, Vigna Nuova) with `total_stock = 800`, `allocated_bottles = 432/324/486` matching `BuyerDashboard` mock pallet data
-  - [ ] Add computed column or view `available_stock = total_stock - allocated_bottles`
-- [ ] Link `virtual_pallets` to `wine_inventory` (AC: 1, 3, 4)
-  - [ ] `ALTER TABLE public.virtual_pallets ADD COLUMN inventory_id uuid REFERENCES public.wine_inventory(id);`
-  - [ ] Column nullable (pallets may not have inventory linked yet)
-- [ ] Create inventory data access layer (AC: 1, 2, 5)
-  - [ ] Add `getInventoryForArea(areaId)` in `src/lib/supabase/queries/wineInventory.ts` — returns inventory for all wineries with open pallets in the area, joined with `winery_profiles`
-  - [ ] Add `getInventoryByPallet(palletId)` — returns the single inventory row linked to a pallet
-- [ ] Extend `BuyerPalletCard` with inventory fields (AC: 1, 3, 4)
-  - [ ] Add `availableStock: number | null`, `totalStock: number | null`, `allocatedBottles: number | null` to `BuyerPalletCard` in `BuyerDashboard.tsx`
-  - [ ] Populate from joined inventory data in `getPalletsByArea` or a separate `getInventoryForArea` call
-- [ ] Build `InventoryStatusBadge` component (AC: 3, 4, 5)
-  - [ ] Create `src/components/pallets/InventoryStatusBadge.tsx`
-  - [ ] Props: `availableStock: number | null`, `allocatedBottles: number | null`, `totalStock: number | null`, `syncError?: boolean`
-  - [ ] Status logic:
+- [x] Create `wine_inventory` table in Supabase (AC: 1, 2, 3, 4, 6)
+  - [x] Schema: `id`, `winery_id` (FK → winery_profiles), `wine_label` (text), `sku` (text, unique per winery), `total_stock` (integer CHECK ≥ 0), `allocated_bottles` (integer DEFAULT 0 CHECK ≥ 0), `updated_at`
+  - [x] RLS: winery owner can INSERT/UPDATE own rows; authenticated users can SELECT all
+  - [x] Seed 3 rows (one per mock winery: Cantina Aurora, Tenuta Collina, Vigna Nuova) with `total_stock = 800`, `allocated_bottles = 432/324/486` matching `BuyerDashboard` mock pallet data
+  - [x] Add computed column or view `available_stock = total_stock - allocated_bottles`
+- [x] Link `virtual_pallets` to `wine_inventory` (AC: 1, 3, 4)
+  - [x] `ALTER TABLE public.virtual_pallets ADD COLUMN inventory_id uuid REFERENCES public.wine_inventory(id);`
+  - [x] Column nullable (pallets may not have inventory linked yet)
+- [x] Create inventory data access layer (AC: 1, 2, 5)
+  - [x] Add `getInventoryForArea(areaId)` in `src/lib/supabase/queries/wineInventory.ts` — returns inventory for all wineries with open pallets in the area, joined with `winery_profiles`
+  - [x] Add `getInventoryByPallet(palletId)` — returns the single inventory row linked to a pallet
+- [x] Extend `BuyerPalletCard` with inventory fields (AC: 1, 3, 4)
+  - [x] Add `availableStock: number | null`, `totalStock: number | null`, `allocatedBottles: number | null` to `BuyerPalletCard` in `BuyerDashboard.tsx`
+  - [x] Populate from joined inventory data in `getPalletsByArea` or a separate `getInventoryForArea` call
+- [x] Build `InventoryStatusBadge` component (AC: 3, 4, 5)
+  - [x] Create `src/components/pallets/InventoryStatusBadge.tsx`
+  - [x] Props: `availableStock: number | null`, `allocatedBottles: number | null`, `totalStock: number | null`, `syncError?: boolean`
+  - [x] Status logic:
     - `availableStock <= 0` → "Out of Stock" (red badge)
     - `allocatedBottles / totalStock >= 0.5` → "Low Stock" (amber badge)
     - `syncError` → "Sync error" (muted grey label)
     - Otherwise → show `availableStock` bottles available (green/neutral)
-  - [ ] "Out of Stock" state disables the "Add Order" button (pass `isOutOfStock` prop up to the card)
-- [ ] Integrate `InventoryStatusBadge` into Grid and Map View pallet cards (AC: 1, 3, 4, 5)
-  - [ ] Grid View: add badge below `PalletPricingBadge` (Story 4.1) in each `<article>`
-  - [ ] Map View: add compact stock chip below the pricing chip
-  - [ ] Disable "Add Order" button when `availableStock <= 0`
-- [ ] Subscribe to Supabase Realtime for `wine_inventory` updates (AC: 2)
-  - [ ] In `BuyerDashboard.tsx`, add a Realtime channel subscription for `UPDATE` events on `wine_inventory`
-  - [ ] Filter by `winery_id` matching any winery in the current area (or subscribe to all, filter client-side)
-  - [ ] On event: update the matching pallet card's inventory fields in `pallets` state
-  - [ ] Cleanup subscription on unmount
-- [ ] Replace static picking list data in `WineryDashboard.tsx` with live DB query (AC: 6)
-  - [ ] Add `getWineryPickingList(wineryId)` query in `src/lib/supabase/queries/virtualPallets.ts` — fetches frozen/open pallets for the winery with joined inventory and area name
-  - [ ] Replace `pickingLists` static array with live state loaded on mount via `useAuth().user.id` → `winery_profiles` lookup → `getWineryPickingList`
-  - [ ] Add `allocated / total` column to the picking list table
-- [ ] Write unit tests (AC: 1, 3, 4, 5, 6)
-  - [ ] Test `InventoryStatusBadge`: out-of-stock condition renders red badge and disables button
-  - [ ] Test `InventoryStatusBadge`: low-stock threshold (50%) renders amber badge
-  - [ ] Test `InventoryStatusBadge`: sync error prop shows error label
-  - [ ] Test Realtime handler: UPDATE event on `wine_inventory` updates matching pallet card state
-  - [ ] Test `getInventoryForArea`: returns correct rows joined with winery data
+  - [x] "Out of Stock" state disables the "Add Order" button (pass `isOutOfStock` prop up to the card)
+- [x] Integrate `InventoryStatusBadge` into Grid and Map View pallet cards (AC: 1, 3, 4, 5)
+  - [x] Grid View: add badge below `PalletPricingBadge` (Story 4.1) in each `<article>`
+  - [x] Map View: add compact stock chip below the pricing chip
+  - [x] Disable "Add Order" button when `availableStock <= 0`
+- [x] Subscribe to Supabase Realtime for `wine_inventory` updates (AC: 2)
+  - [x] In `BuyerDashboard.tsx`, add a Realtime channel subscription for `UPDATE` events on `wine_inventory`
+  - [x] Filter by `winery_id` matching any winery in the current area (or subscribe to all, filter client-side)
+  - [x] On event: update the matching pallet card's inventory fields in `pallets` state
+  - [x] Cleanup subscription on unmount
+- [x] Replace static picking list data in `WineryDashboard.tsx` with live DB query (AC: 6)
+  - [x] Add `getWineryPickingList(wineryId)` query in `src/lib/supabase/queries/virtualPallets.ts` — fetches frozen/open pallets for the winery with joined inventory and area name
+  - [x] Replace `pickingLists` static array with live state loaded on mount via `useAuth().user.id` → `winery_profiles` lookup → `getWineryPickingList`
+  - [x] Add `allocated / total` column to the picking list table
+- [x] Write unit tests (AC: 1, 3, 4, 5, 6)
+  - [x] Test `InventoryStatusBadge`: out-of-stock condition renders red badge and disables button
+  - [x] Test `InventoryStatusBadge`: low-stock threshold (50%) renders amber badge
+  - [x] Test `InventoryStatusBadge`: sync error prop shows error label
+  - [x] Test Realtime handler: UPDATE event on `wine_inventory` updates matching pallet card state
+  - [x] Test `getInventoryForArea`: returns correct rows joined with winery data
 
 ## Dev Notes
 
