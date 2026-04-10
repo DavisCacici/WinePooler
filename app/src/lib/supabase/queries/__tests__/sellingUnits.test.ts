@@ -68,7 +68,16 @@ describe('getSellingUnitsByWinery', () => {
 
 describe('upsertSellingUnit', () => {
   it('upserts and returns the selling unit', async () => {
-    const input = { winery_id: 'w-1', unit_type: 'case' as const, bottles_per_case: 6, composition_type: null, pallet_quantity: null }
+    const input = { 
+      winery_id: 'w-1', 
+      unit_type: 'case' as const, 
+      bottles_per_case: 6, 
+      composition_type: null, 
+      pallet_quantity: null,
+      discount_pct: 0,
+      created_at: '2024-06-01T00:00:00Z',
+      updated_at: '2024-06-01T00:00:00Z'
+    }
     const saved = { id: 'su-new', ...input }
 
     mockFrom.mockReturnValue({ upsert: mockUpsert })
@@ -84,7 +93,16 @@ describe('upsertSellingUnit', () => {
   })
 
   it('throws when upsert fails', async () => {
-    const input = { winery_id: 'w-1', unit_type: 'case' as const, bottles_per_case: 6, composition_type: null, pallet_quantity: null }
+    const input = { 
+      winery_id: 'w-1', 
+      unit_type: 'case' as const, 
+      bottles_per_case: 6, 
+      composition_type: null, 
+      pallet_quantity: null,
+      discount_pct: 0,
+      created_at: '2024-06-01T00:00:00Z',
+      updated_at: '2024-06-01T00:00:00Z'
+    }
 
     mockFrom.mockReturnValue({ upsert: mockUpsert })
     mockUpsert.mockReturnValue({ select: mockSelect })

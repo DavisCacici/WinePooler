@@ -23,6 +23,7 @@ const makeSellingUnit = (overrides: Partial<sellingUnitsQueries.SellingUnit> = {
   pallet_quantity: null,
   created_at: '',
   updated_at: '',
+  discount_pct: 0,
   ...overrides,
 })
 

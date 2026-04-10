@@ -137,7 +137,10 @@ describe('BuyerDashboard - profile completion guard', () => {
         inventory_id: null,
         available_stock: null,
         total_stock: null,
-        allocated_bottles: null
+        allocated_bottles: null,
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
       {
         id: 'pal-2',
@@ -154,7 +157,10 @@ describe('BuyerDashboard - profile completion guard', () => {
         inventory_id: null,
         available_stock: null,
         total_stock: null,
-        allocated_bottles: null
+        allocated_bottles: null,
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
     ])
 
@@ -269,7 +275,10 @@ describe('BuyerDashboard - Add Order button state', () => {
         inventory_id: null,
         available_stock: null,
         total_stock: null,
-        allocated_bottles: null
+        allocated_bottles: null,
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
     ])
 
@@ -304,7 +313,10 @@ describe('BuyerDashboard - Add Order button state', () => {
         inventory_id: null,
         available_stock: null,
         total_stock: null,
-        allocated_bottles: null
+        allocated_bottles: null,
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
     ])
 
@@ -340,6 +352,9 @@ describe('BuyerDashboard - Add Order button state', () => {
         available_stock: null,
         total_stock: null,
         allocated_bottles: null,
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
     ])
 
@@ -406,7 +421,9 @@ describe('BuyerDashboard - Add Order button state', () => {
         available_stock: null,
         total_stock: null,
         allocated_bottles: null,
-
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
     ])
     vi.mocked(virtualPalletQueries.buyerHasOrderOnPallet).mockResolvedValue(true)
@@ -454,6 +471,9 @@ describe('BuyerDashboard - Add Order button state', () => {
         available_stock: null,
         total_stock: null,
         allocated_bottles: null,
+        bottles_per_display_unit: null,
+        display_unit: null,
+        display_unit_label: null
       },
     ])
     vi.mocked(virtualPalletQueries.buyerHasOrderOnPallet).mockResolvedValue(false)

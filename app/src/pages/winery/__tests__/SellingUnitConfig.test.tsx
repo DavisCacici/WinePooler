@@ -136,6 +136,42 @@ describe('SellingUnitConfig', () => {
     })
   })
 
+  it('saves non-zero discount_pct when set by the user', async () => {
+    vi.mocked(sellingUnitsQueries.getSellingUnitsByWinery).mockResolvedValue([])
+    vi.mocked(sellingUnitsQueries.upsertSellingUnit).mockResolvedValue({
+      id: 'su-new',
+      winery_id: 'winery-1',
+      unit_type: 'case',
+      bottles_per_case: 6,
+      composition_type: null,
+      pallet_quantity: null,
+      discount_pct: 10,
+      created_at: '',
+      updated_at: '',
+    })
+
+    render(<SellingUnitConfig wineryProfileId="winery-1" />)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Selling Units/)).toBeInTheDocument()
+    })
+
+    // Enable case unit
+    fireEvent.click(screen.getByLabelText('Case Unit'))
+
+    // Set a 10% discount
+    fireEvent.change(screen.getByLabelText(/Case Discount/i), { target: { value: '10' } })
+
+    // Save
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(sellingUnitsQueries.upsertSellingUnit).toHaveBeenCalledWith(
+        expect.objectContaining({ discount_pct: 10 })
+      )
+    })
+  })
+
   it('shows error feedback when save fails', async () => {
     vi.mocked(sellingUnitsQueries.getSellingUnitsByWinery).mockResolvedValue([])
     vi.mocked(sellingUnitsQueries.upsertSellingUnit).mockRejectedValue(new Error('Save failed'))
