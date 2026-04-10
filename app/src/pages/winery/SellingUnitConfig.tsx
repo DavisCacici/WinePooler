@@ -9,9 +9,11 @@ import {
 interface SellingUnitFormState {
   caseEnabled: boolean
   bottlesPerCase: number
+  caseDiscountPct: number
   palletEnabled: boolean
   compositionType: 'bottles' | 'cases'
   palletQuantity: number
+  palletDiscountPct: number
 }
 
 interface SellingUnitConfigProps {
@@ -22,9 +24,11 @@ const SellingUnitConfig = ({ wineryProfileId }: SellingUnitConfigProps) => {
   const [form, setForm] = useState<SellingUnitFormState>({
     caseEnabled: false,
     bottlesPerCase: 6,
+    caseDiscountPct: 0,
     palletEnabled: false,
     compositionType: 'bottles',
     palletQuantity: 60,
+    palletDiscountPct: 0,
   })
   const [existingUnits, setExistingUnits] = useState<SellingUnit[]>([])
   const [saving, setSaving] = useState(false)
@@ -42,9 +46,11 @@ const SellingUnitConfig = ({ wineryProfileId }: SellingUnitConfigProps) => {
         setForm({
           caseEnabled: !!caseUnit,
           bottlesPerCase: caseUnit?.bottles_per_case ?? 6,
+          caseDiscountPct: caseUnit?.discount_pct ?? 0,
           palletEnabled: !!palletUnit,
           compositionType: (palletUnit?.composition_type as 'bottles' | 'cases') ?? 'bottles',
           palletQuantity: palletUnit?.pallet_quantity ?? 60,
+          palletDiscountPct: palletUnit?.discount_pct ?? 0,
         })
       })
       .catch(() => {
@@ -82,6 +88,7 @@ const SellingUnitConfig = ({ wineryProfileId }: SellingUnitConfigProps) => {
           bottles_per_case: form.bottlesPerCase,
           composition_type: null,
           pallet_quantity: null,
+          discount_pct: form.caseDiscountPct,
         })
       } else {
         const existing = existingUnits.find((u) => u.unit_type === 'case')
@@ -96,6 +103,7 @@ const SellingUnitConfig = ({ wineryProfileId }: SellingUnitConfigProps) => {
           bottles_per_case: null,
           composition_type: form.compositionType,
           pallet_quantity: form.palletQuantity,
+          discount_pct: form.palletDiscountPct,
         })
       } else {
         const existing = existingUnits.find((u) => u.unit_type === 'pallet')
@@ -155,17 +163,34 @@ const SellingUnitConfig = ({ wineryProfileId }: SellingUnitConfigProps) => {
             </label>
           </div>
           {form.caseEnabled && (
-            <div className="mt-3">
-              <label className="block text-sm text-secondary" htmlFor="bottles-per-case">Bottles per Case</label>
-              <input
-                id="bottles-per-case"
-                type="number"
-                min={2}
-                max={100}
-                value={form.bottlesPerCase}
-                onChange={(e) => setForm((prev) => ({ ...prev, bottlesPerCase: Number(e.target.value) }))}
-                className="mt-1 w-32 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
+            <div className="mt-3 space-y-3">
+              <div>
+                <label className="block text-sm text-secondary" htmlFor="bottles-per-case">Bottles per Case</label>
+                <input
+                  id="bottles-per-case"
+                  type="number"
+                  min={2}
+                  max={100}
+                  value={form.bottlesPerCase}
+                  onChange={(e) => setForm((prev) => ({ ...prev, bottlesPerCase: Number(e.target.value) }))}
+                  className="mt-1 w-32 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-secondary" htmlFor="case-discount-pct">
+                  Case Discount % <span className="text-muted">(optional, 0–100)</span>
+                </label>
+                <input
+                  id="case-discount-pct"
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.01}
+                  value={form.caseDiscountPct}
+                  onChange={(e) => setForm((prev) => ({ ...prev, caseDiscountPct: Number(e.target.value) }))}
+                  className="mt-1 w-32 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
             </div>
           )}
         </div>
@@ -214,6 +239,21 @@ const SellingUnitConfig = ({ wineryProfileId }: SellingUnitConfigProps) => {
               {palletBottleEquivalent && (
                 <p className="text-xs text-muted">{palletBottleEquivalent}</p>
               )}
+              <div>
+                <label className="block text-sm text-secondary" htmlFor="pallet-discount-pct">
+                  Pallet Discount % <span className="text-muted">(optional, 0–100)</span>
+                </label>
+                <input
+                  id="pallet-discount-pct"
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.01}
+                  value={form.palletDiscountPct}
+                  onChange={(e) => setForm((prev) => ({ ...prev, palletDiscountPct: Number(e.target.value) }))}
+                  className="mt-1 w-32 rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
             </div>
           )}
         </div>

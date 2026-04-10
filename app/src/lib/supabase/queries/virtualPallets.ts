@@ -14,6 +14,9 @@ export interface VirtualPallet {
   available_stock: number | null
   total_stock: number | null
   allocated_bottles: number | null
+  display_unit: string | null
+  display_unit_label: string | null
+  bottles_per_display_unit: number | null
   area_name?: string
   winery_name?: string
 }
@@ -24,6 +27,7 @@ export const getPalletsByArea = async (areaId: string): Promise<VirtualPallet[]>
     .select(`
       id, area_id, winery_id, state, bottle_count, threshold, created_by,
       bulk_price_per_bottle, retail_price_per_bottle, inventory_id,
+      display_unit, display_unit_label, bottles_per_display_unit,
       macro_areas(name),
       winery_profiles(company_name),
       wine_inventory(total_stock, allocated_bottles)
@@ -44,6 +48,9 @@ export const getPalletsByArea = async (areaId: string): Promise<VirtualPallet[]>
     bulk_price_per_bottle: row.bulk_price_per_bottle ?? null,
     retail_price_per_bottle: row.retail_price_per_bottle ?? null,
     inventory_id: row.inventory_id ?? null,
+    display_unit: row.display_unit ?? null,
+    display_unit_label: row.display_unit_label ?? null,
+    bottles_per_display_unit: row.bottles_per_display_unit ?? null,
     available_stock: row.wine_inventory
       ? row.wine_inventory.total_stock - row.wine_inventory.allocated_bottles
       : null,
@@ -74,17 +81,30 @@ export const createVirtualPallet = async (payload: {
   area_id: string
   winery_id: string
   created_by: string
+  threshold?: number
   bulk_price_per_bottle?: number | null
   retail_price_per_bottle?: number | null
+  display_unit?: string | null
+  display_unit_label?: string | null
+  bottles_per_display_unit?: number | null
 }): Promise<VirtualPallet> => {
   const { data, error } = await supabase
     .from('virtual_pallets')
     .insert(payload)
-    .select('id, area_id, winery_id, state, bottle_count, threshold, created_by, bulk_price_per_bottle, retail_price_per_bottle')
+    .select('id, area_id, winery_id, state, bottle_count, threshold, created_by, bulk_price_per_bottle, retail_price_per_bottle, display_unit, display_unit_label, bottles_per_display_unit')
     .single()
 
   if (error) throw error
-  return data as VirtualPallet
+  return {
+    ...(data as any),
+    inventory_id: null,
+    available_stock: null,
+    total_stock: null,
+    allocated_bottles: null,
+    display_unit: (data as any).display_unit ?? null,
+    display_unit_label: (data as any).display_unit_label ?? null,
+    bottles_per_display_unit: (data as any).bottles_per_display_unit ?? null,
+  }
 }
 
 export const getPalletById = async (palletId: string): Promise<VirtualPallet | null> => {
@@ -92,6 +112,8 @@ export const getPalletById = async (palletId: string): Promise<VirtualPallet | n
     .from('virtual_pallets')
     .select(`
       id, area_id, winery_id, state, bottle_count, threshold, created_by,
+      bulk_price_per_bottle, retail_price_per_bottle, inventory_id,
+      display_unit, display_unit_label, bottles_per_display_unit,
       macro_areas(name),
       winery_profiles(company_name)
     `)
@@ -103,6 +125,9 @@ export const getPalletById = async (palletId: string): Promise<VirtualPallet | n
 
   return {
     ...(data as any),
+    display_unit: (data as any).display_unit ?? null,
+    display_unit_label: (data as any).display_unit_label ?? null,
+    bottles_per_display_unit: (data as any).bottles_per_display_unit ?? null,
     area_name: (data as any).macro_areas?.name,
     winery_name: (data as any).winery_profiles?.company_name,
   }

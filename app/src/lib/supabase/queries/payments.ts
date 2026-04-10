@@ -63,6 +63,8 @@ export async function commitAuthorizedOrder(params: {
   paymentIntentId: string
   wineLabel?: string
   notes?: string
+  unitType?: string
+  unitQuantity?: number
 }): Promise<CommitAuthorizedOrderResponse> {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) throw new Error('Not authenticated')

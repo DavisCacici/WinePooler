@@ -5,6 +5,7 @@ import {
   createVirtualPallet,
   getOpenPalletForWinery,
 } from '../../lib/supabase/queries/virtualPallets'
+import { computePalletThreshold } from '../../lib/supabase/queries/sellingUnits'
 
 interface CreatePalletModalProps {
   areaId: string
@@ -31,6 +32,7 @@ const CreatePalletModal = ({
   const [submitting, setSubmitting] = useState(false)
   const [bulkPrice, setBulkPrice] = useState('')
   const [retailPrice, setRetailPrice] = useState('')
+  const [thresholdLabel, setThresholdLabel] = useState<string | null>(null)
 
   const loadWineries = async () => {
     setLoadingWineries(true)
@@ -52,6 +54,27 @@ const CreatePalletModal = ({
   useEffect(() => {
     loadWineries()
   }, [])
+
+  useEffect(() => {
+    if (!selectedWineryId) {
+      setThresholdLabel(null)
+      return
+    }
+    let active = true
+    computePalletThreshold(selectedWineryId).then(info => {
+      if (!active) return
+      if (info.displayUnit === 'bottle') {
+        setThresholdLabel(`This pallet will hold ${info.threshold} bottles`)
+      } else {
+        setThresholdLabel(
+          `This pallet will hold ${info.threshold / (info.bottlesPerDisplayUnit ?? 1)} ${info.displayUnitLabel} (${info.threshold} bottles)`
+        )
+      }
+    }).catch(() => {
+      if (active) setThresholdLabel(null)
+    })
+    return () => { active = false }
+  }, [selectedWineryId])
 
   const selectedWineryName = useMemo(
     () => wineries.find(winery => winery.id === selectedWineryId)?.company_name ?? '',
@@ -79,10 +102,15 @@ const CreatePalletModal = ({
         return
       }
 
+      const thresholdInfo = await computePalletThreshold(selectedWineryId)
       await createVirtualPallet({
         area_id: areaId,
         winery_id: selectedWineryId,
         created_by: buyerUserId,
+        threshold: thresholdInfo.threshold,
+        display_unit: thresholdInfo.displayUnit,
+        display_unit_label: thresholdInfo.displayUnitLabel,
+        bottles_per_display_unit: thresholdInfo.bottlesPerDisplayUnit,
         bulk_price_per_bottle: bulkPrice ? parseFloat(bulkPrice) : null,
         retail_price_per_bottle: retailPrice ? parseFloat(retailPrice) : null,
       })
@@ -160,6 +188,10 @@ const CreatePalletModal = ({
                   Retry
                 </button>
               </div>
+            )}
+
+            {thresholdLabel && (
+              <p className="mt-2 text-xs text-secondary" data-testid="threshold-info">{thresholdLabel}</p>
             )}
           </div>
 

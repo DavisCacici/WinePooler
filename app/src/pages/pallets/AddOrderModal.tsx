@@ -7,6 +7,12 @@ import {
   createEscrowPaymentIntent,
   commitAuthorizedOrder,
 } from '../../lib/supabase/queries/payments'
+import {
+  getEnabledSellingUnitsForProduct,
+  getSellingUnitsByWinery,
+  toBottleEquivalent,
+  type SellingUnit,
+} from '../../lib/supabase/queries/sellingUnits'
 
 export type PaymentFlowState =
   | 'order_details'
@@ -67,6 +73,12 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
   const [amountCents, setAmountCents] = useState<number>(0)
 
+  // Selling unit state
+  const [sellingUnits, setSellingUnits] = useState<SellingUnit[]>([])
+  const [enabledUnitTypes, setEnabledUnitTypes] = useState<string[]>(['bottle'])
+  const [selectedUnit, setSelectedUnit] = useState<string>('bottle')
+  const [loadingUnits, setLoadingUnits] = useState(false)
+
   // Close on Escape key
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -75,6 +87,52 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [onClose, loading])
+
+  // Fetch enabled selling units when modal opens
+  useEffect(() => {
+    if (!pallet.winery_id) return
+
+    let active = true
+    setLoadingUnits(true)
+
+    const fetchUnits = async () => {
+      try {
+        const [allUnits, enabledUnits] = await Promise.all([
+          getSellingUnitsByWinery(pallet.winery_id),
+          pallet.inventory_id
+            ? getEnabledSellingUnitsForProduct(pallet.inventory_id)
+            : Promise.resolve([] as SellingUnit[]),
+        ])
+
+        if (!active) return
+
+        setSellingUnits(allUnits)
+
+        if (pallet.inventory_id && enabledUnits.length > 0) {
+          // Use the enabled unit types in priority order: bottle > case > pallet
+          const enabled = ['bottle', 'case', 'pallet'].filter(t =>
+            t === 'bottle' || enabledUnits.some(u => u.unit_type === t)
+          )
+          setEnabledUnitTypes(enabled)
+          setSelectedUnit(enabled[0])
+        } else {
+          // No product link or no selling units: bottle only
+          setEnabledUnitTypes(['bottle'])
+          setSelectedUnit('bottle')
+        }
+      } catch {
+        if (active) {
+          setEnabledUnitTypes(['bottle'])
+          setSelectedUnit('bottle')
+        }
+      } finally {
+        if (active) setLoadingUnits(false)
+      }
+    }
+
+    fetchUnits()
+    return () => { active = false }
+  }, [pallet.winery_id, pallet.inventory_id])
 
   const validateQuantity = (value: string): string | null => {
     if (!value.trim()) return 'Quantity is required'
@@ -104,7 +162,9 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
     setFlowState('authorizing')
 
     try {
-      const intent = await createEscrowPaymentIntent(pallet.id, Number(quantity))
+      const unitQty = Number(quantity)
+      const bottleEquivalent = toBottleEquivalent(selectedUnit, unitQty, sellingUnits)
+      const intent = await createEscrowPaymentIntent(pallet.id, bottleEquivalent)
       setClientSecret(intent.clientSecret)
       setPaymentIntentId(intent.paymentIntentId)
       setAmountCents(intent.amountCents)
@@ -158,12 +218,16 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
 
       // 2. Commit the order via Edge Function
       setFlowState('committing')
+      const unitQty = Number(quantity)
+      const bottleEquivalent = toBottleEquivalent(selectedUnit, unitQty, sellingUnits)
       const result = await commitAuthorizedOrder({
         palletId: pallet.id,
-        quantity: Number(quantity),
+        quantity: bottleEquivalent,
         paymentIntentId: paymentIntent.id,
         wineLabel: wineLabel.trim() || undefined,
         notes: notes.trim() || undefined,
+        unitType: selectedUnit,
+        unitQuantity: selectedUnit !== 'bottle' ? unitQty : undefined,
       })
 
       if (result.newState === 'frozen') {
@@ -243,9 +307,42 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
         {/* Step 1: Order details form */}
         {step === 'order_details' && (
           <form onSubmit={handleProceedToPayment} noValidate className="mt-6 space-y-4">
+            {/* Unit selector — only shown when more than bottle is available */}
+            {!loadingUnits && enabledUnitTypes.length > 1 && (
+              <div>
+                <label htmlFor="order-unit" className="block text-sm font-medium text-secondary">
+                  Order unit
+                </label>
+                <select
+                  id="order-unit"
+                  value={selectedUnit}
+                  onChange={e => {
+                    setSelectedUnit(e.target.value)
+                    setQuantity('')
+                    setQuantityError(null)
+                  }}
+                  className="mt-1 block w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-primary"
+                >
+                  {enabledUnitTypes.map(type => {
+                    const unit = sellingUnits.find(u => u.unit_type === type)
+                    let label = 'Bottle'
+                    if (type === 'case' && unit?.bottles_per_case) {
+                      label = `Case (${unit.bottles_per_case} bottles)`
+                    } else if (type === 'pallet' && unit?.pallet_quantity) {
+                      label = unit.composition_type === 'cases'
+                        ? `Pallet (${unit.pallet_quantity} cases)`
+                        : `Pallet (${unit.pallet_quantity} bottles)`
+                    }
+                    return <option key={type} value={type}>{label}</option>
+                  })}
+                </select>
+              </div>
+            )}
+
             <div>
               <label htmlFor="order-quantity" className="block text-sm font-medium text-secondary">
-                Quantity (bottles) <span aria-hidden="true">*</span>
+                Quantity ({selectedUnit === 'bottle' ? 'bottles' : selectedUnit === 'case' ? 'cases' : 'pallets'}){' '}
+                <span aria-hidden="true">*</span>
               </label>
               <input
                 id="order-quantity"
@@ -264,6 +361,19 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
                   {quantityError}
                 </p>
               )}
+              {/* Conversion line */}
+              {selectedUnit !== 'bottle' && quantity && !validateQuantity(quantity) && (() => {
+                try {
+                  const equiv = toBottleEquivalent(selectedUnit, Number(quantity), sellingUnits)
+                  return (
+                    <p className="mt-1 text-xs text-secondary" data-testid="conversion-line">
+                      {quantity} {selectedUnit}(s) = {equiv} bottles
+                    </p>
+                  )
+                } catch {
+                  return null
+                }
+              })()}
             </div>
 
             <div>
@@ -301,14 +411,21 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
             )}
 
             {/* Amount preview */}
-            {hasPricing && quantity && !validateQuantity(quantity) && (
-              <div className="rounded-xl bg-success-bg p-3 text-sm text-success-text">
-                Authorization amount:{' '}
-                <span className="font-semibold">
-                  {formatCentsToEur(computeAmountCents(Number(quantity), pallet.bulk_price_per_bottle!))}
-                </span>
-              </div>
-            )}
+            {hasPricing && quantity && !validateQuantity(quantity) && (() => {
+              try {
+                const equiv = toBottleEquivalent(selectedUnit, Number(quantity), sellingUnits)
+                return (
+                  <div className="rounded-xl bg-success-bg p-3 text-sm text-success-text">
+                    Authorization amount:{' '}
+                    <span className="font-semibold">
+                      {formatCentsToEur(computeAmountCents(equiv, pallet.bulk_price_per_bottle!))}
+                    </span>
+                  </div>
+                )
+              } catch {
+                return null
+              }
+            })()}
 
             <div className="flex gap-3 pt-2">
               <button
@@ -336,7 +453,11 @@ const PaymentForm = ({ pallet, buyerUserId, onClose, onOrderAdded }: PaymentForm
             {/* Order summary */}
             <div className="rounded-xl bg-surface-alt p-3 text-sm text-secondary">
               <p>
-                <span className="font-medium">{quantity} bottles</span>
+                <span className="font-medium">
+                  {selectedUnit !== 'bottle'
+                    ? `${quantity} ${selectedUnit}(s) = ${toBottleEquivalent(selectedUnit, Number(quantity), sellingUnits)} bottles`
+                    : `${quantity} bottles`}
+                </span>
                 {wineLabel && <span className="text-muted"> — {wineLabel}</span>}
               </p>
               <p className="mt-1 font-semibold text-accent-buyer">

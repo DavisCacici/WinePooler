@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { palletProgressLabel, palletProgressPercent } from '../palletProgress'
+import { palletProgressLabel, palletProgressPercent, palletProgressUnitLabel } from '../palletProgress'
 
 describe('palletProgressPercent', () => {
   it('calculates rounded percent', () => {
@@ -19,5 +19,27 @@ describe('palletProgressPercent', () => {
 describe('palletProgressLabel', () => {
   it('formats percent label', () => {
     expect(palletProgressLabel(300, 600)).toBe('50%')
+  })
+})
+
+describe('palletProgressUnitLabel', () => {
+  it('shows case-based label when displayUnit is case', () => {
+    expect(palletProgressUnitLabel(42, 360, 'case', 'cases of 6', 6)).toBe('7/60 cases of 6')
+  })
+
+  it('floors partial cases', () => {
+    expect(palletProgressUnitLabel(43, 360, 'case', 'cases of 6', 6)).toBe('7/60 cases of 6')
+  })
+
+  it('falls back to bottles when displayUnit is bottle', () => {
+    expect(palletProgressUnitLabel(100, 600, 'bottle', 'bottles', null)).toBe('100/600 bottles')
+  })
+
+  it('falls back to bottles when displayUnit is null', () => {
+    expect(palletProgressUnitLabel(100, 600, null, null, null)).toBe('100/600 bottles')
+  })
+
+  it('falls back to bottles when bottlesPerDisplayUnit is null', () => {
+    expect(palletProgressUnitLabel(30, 360, 'case', 'cases', null)).toBe('30/360 bottles')
   })
 })

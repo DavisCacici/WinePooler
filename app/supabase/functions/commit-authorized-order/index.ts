@@ -38,7 +38,7 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     // 2. Parse request body
-    const { palletId, quantity, paymentIntentId, wineLabel, notes } = await req.json()
+    const { palletId, quantity, paymentIntentId, wineLabel, notes, unitType, unitQuantity } = await req.json()
     if (!palletId || !quantity || !paymentIntentId) {
       return new Response(JSON.stringify({ error: 'Missing required fields: palletId, quantity, paymentIntentId' }), {
         status: 400,
@@ -84,6 +84,8 @@ export default async function handler(req: Request): Promise<Response> {
         p_capture_before: null,
         p_wine_label: wineLabel ?? null,
         p_notes: notes ?? null,
+        p_unit_type: unitType ?? 'bottle',
+        p_unit_quantity: unitQuantity ?? null,
       }
     )
 

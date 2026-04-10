@@ -40,6 +40,7 @@ describe('SellingUnitConfig', () => {
         bottles_per_case: 12,
         composition_type: null,
         pallet_quantity: null,
+        discount_pct: 0,
         created_at: '',
         updated_at: '',
       },
@@ -50,6 +51,7 @@ describe('SellingUnitConfig', () => {
         bottles_per_case: null,
         composition_type: 'cases',
         pallet_quantity: 40,
+        discount_pct: 0,
         created_at: '',
         updated_at: '',
       },
@@ -103,6 +105,7 @@ describe('SellingUnitConfig', () => {
       bottles_per_case: 6,
       composition_type: null,
       pallet_quantity: null,
+      discount_pct: 0,
       created_at: '',
       updated_at: '',
     })
@@ -129,6 +132,7 @@ describe('SellingUnitConfig', () => {
       bottles_per_case: 6,
       composition_type: null,
       pallet_quantity: null,
+      discount_pct: 0,
     })
   })
 

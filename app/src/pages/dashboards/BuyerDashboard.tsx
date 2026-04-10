@@ -4,7 +4,8 @@ import { useAuth } from '../../lib/supabase/AuthContext'
 import { getBuyerProfile } from '../../lib/supabase/queries/buyerProfile'
 import { getBuyerPreferences, type BuyerPreferences } from '../../lib/supabase/queries/buyerPreferences'
 import { getPalletsByArea, buyerHasOrderOnPallet } from '../../lib/supabase/queries/virtualPallets'
-import { palletProgressLabel } from '../../lib/palletProgress'
+import { palletProgressLabel, palletProgressUnitLabel } from '../../lib/palletProgress'
+import { getSellingUnitsByWinery, computeUnitPrices, type UnitPrice } from '../../lib/supabase/queries/sellingUnits'
 import CreatePalletModal from '../pallets/CreatePalletModal'
 import AddOrderModal from '../pallets/AddOrderModal'
 import FreezeNotification from '../../components/notifications/FreezeNotification'
@@ -17,7 +18,9 @@ interface BuyerPalletCard {
   palletId: string
   area: string
   winery: string
+  wineryId: string
   progress: string
+  progressUnitLabel: string
   bottles: number
   threshold: number
   state: 'open' | 'frozen' | 'completed'
@@ -27,6 +30,10 @@ interface BuyerPalletCard {
   totalStock: number | null
   allocatedBottles: number | null
   inventoryId: string | null
+  displayUnit: string | null
+  displayUnitLabel: string | null
+  bottlesPerDisplayUnit: number | null
+  unitPrices: UnitPrice[]
   inventorySyncError?: boolean
 }
 
@@ -150,27 +157,58 @@ const BuyerDashboard = () => {
     setLoadingPallets(true)
 
     getPalletsByArea(areaId)
-      .then(rows => {
+      .then(async rows => {
         if (!isMounted) {
           return
         }
 
-        const mapped = rows.map(row => ({
-          id: row.id,
-          palletId: row.id,
-          area: row.area_name ?? activeAreaName ?? '',
-          winery: row.winery_name ?? 'Unknown winery',
-          progress: palletProgressLabel(row.bottle_count, row.threshold),
-          bottles: row.bottle_count,
-          threshold: row.threshold,
-          state: row.state,
-          bulkPrice: row.bulk_price_per_bottle,
-          retailPrice: row.retail_price_per_bottle,
-          availableStock: row.available_stock,
-          totalStock: row.total_stock,
-          allocatedBottles: row.allocated_bottles,
-          inventoryId: row.inventory_id,
-        }))
+        // Batch-fetch selling units per unique winery (O(N wineries) not O(N pallets))
+        const uniqueWineryIds = [...new Set(rows.map(r => r.winery_id))]
+        const sellingUnitsByWinery = new Map<string, Awaited<ReturnType<typeof getSellingUnitsByWinery>>>()
+        await Promise.all(
+          uniqueWineryIds.map(wId =>
+            getSellingUnitsByWinery(wId)
+              .then(units => sellingUnitsByWinery.set(wId, units))
+              .catch(() => sellingUnitsByWinery.set(wId, []))
+          )
+        )
+
+        if (!isMounted) return
+
+        const mapped = rows.map(row => {
+          const units = sellingUnitsByWinery.get(row.winery_id) ?? []
+          const unitPrices = row.bulk_price_per_bottle
+            ? computeUnitPrices(row.bulk_price_per_bottle, row.retail_price_per_bottle, units)
+            : []
+          return {
+            id: row.id,
+            palletId: row.id,
+            area: row.area_name ?? activeAreaName ?? '',
+            winery: row.winery_name ?? 'Unknown winery',
+            wineryId: row.winery_id,
+            progress: palletProgressLabel(row.bottle_count, row.threshold),
+            progressUnitLabel: palletProgressUnitLabel(
+              row.bottle_count,
+              row.threshold,
+              row.display_unit,
+              row.display_unit_label,
+              row.bottles_per_display_unit,
+            ),
+            bottles: row.bottle_count,
+            threshold: row.threshold,
+            state: row.state,
+            bulkPrice: row.bulk_price_per_bottle,
+            retailPrice: row.retail_price_per_bottle,
+            availableStock: row.available_stock,
+            totalStock: row.total_stock,
+            allocatedBottles: row.allocated_bottles,
+            inventoryId: row.inventory_id,
+            displayUnit: row.display_unit,
+            displayUnitLabel: row.display_unit_label,
+            bottlesPerDisplayUnit: row.bottles_per_display_unit,
+            unitPrices,
+          }
+        })
 
         setPallets(mapped)
       })
@@ -217,6 +255,13 @@ const BuyerDashboard = () => {
                     ...p,
                     bottles: updated.bottle_count,
                     progress: palletProgressLabel(updated.bottle_count, p.threshold),
+                    progressUnitLabel: palletProgressUnitLabel(
+                      updated.bottle_count,
+                      p.threshold,
+                      p.displayUnit,
+                      p.displayUnitLabel,
+                      p.bottlesPerDisplayUnit,
+                    ),
                     state: updated.state as BuyerPalletCard['state'],
                   }
                 : p
@@ -306,6 +351,13 @@ const BuyerDashboard = () => {
               ...p,
               bottles: newCount,
               progress: palletProgressLabel(newCount, p.threshold),
+              progressUnitLabel: palletProgressUnitLabel(
+                newCount,
+                p.threshold,
+                p.displayUnit,
+                p.displayUnitLabel,
+                p.bottlesPerDisplayUnit,
+              ),
               state: newState,
             }
           : p
@@ -427,8 +479,8 @@ const BuyerDashboard = () => {
                     >
                       <p className="text-xs font-semibold uppercase tracking-wide text-accent-buyer">{pallet.area}</p>
                       <p className="mt-2 text-base font-semibold text-primary">{pallet.winery}</p>
-                      <p className="mt-1 text-sm text-secondary">Progress {pallet.progress}</p>
-                      <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} compact />
+                      <p className="mt-1 text-sm text-secondary">Progress {pallet.progressUnitLabel}</p>
+                      <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} unitPrices={pallet.unitPrices} compact />
                       <InventoryStatusBadge
                         availableStock={pallet.availableStock}
                         allocatedBottles={pallet.allocatedBottles}
@@ -485,8 +537,8 @@ const BuyerDashboard = () => {
                     <div className="mt-4 h-2 rounded-full bg-surface-elevated">
                       <div className="h-2 rounded-full bg-accent-buyer" style={{ width: pallet.progress }} />
                     </div>
-                    <p className="mt-3 text-sm text-secondary">{pallet.bottles} bottles committed</p>
-                    <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} />
+                    <p className="mt-3 text-sm text-secondary">{pallet.progressUnitLabel}</p>
+                    <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} unitPrices={pallet.unitPrices} />
                     <InventoryStatusBadge
                       availableStock={pallet.availableStock}
                       allocatedBottles={pallet.allocatedBottles}
@@ -526,17 +578,20 @@ const BuyerDashboard = () => {
             pallet={{
               id: activePalletForOrder.palletId,
               area_id: areaId ?? '',
-              winery_id: '',
+              winery_id: activePalletForOrder.wineryId,
               state: activePalletForOrder.state,
               bottle_count: activePalletForOrder.bottles,
               threshold: activePalletForOrder.threshold,
               created_by: '',
-              bulk_price_per_bottle: null,
-              retail_price_per_bottle: null,
-              inventory_id: null,
-              available_stock: null,
-              total_stock: null,
-              allocated_bottles: null,
+              bulk_price_per_bottle: activePalletForOrder.bulkPrice,
+              retail_price_per_bottle: activePalletForOrder.retailPrice,
+              inventory_id: activePalletForOrder.inventoryId,
+              available_stock: activePalletForOrder.availableStock,
+              total_stock: activePalletForOrder.totalStock,
+              allocated_bottles: activePalletForOrder.allocatedBottles,
+              display_unit: activePalletForOrder.displayUnit,
+              display_unit_label: activePalletForOrder.displayUnitLabel,
+              bottles_per_display_unit: activePalletForOrder.bottlesPerDisplayUnit,
               area_name: activePalletForOrder.area,
               winery_name: activePalletForOrder.winery,
             }}
