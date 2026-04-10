@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react'
-import { getWineryInventory, type WineInventory } from '../../lib/supabase/queries/wineInventory'
+import { getWineryInventory } from '../../lib/supabase/queries/wineInventory'
 import {
   getSellingUnitsByWinery,
   getProductSellingUnits,
   toggleProductSellingUnit,
   type SellingUnit,
-  type ProductSellingUnit,
 } from '../../lib/supabase/queries/sellingUnits'
 
 interface ProductUnitRow {
