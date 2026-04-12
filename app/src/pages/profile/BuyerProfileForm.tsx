@@ -294,7 +294,7 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-full bg-accent-buyer px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+                className="rounded-full border border-border bg-surface-alt px-6 py-2.5 text-sm font-medium text-secondary hover:bg-surface-elevated"
               >
                 {submitting ? 'Saving…' : mode === 'complete' ? 'Save & Continue' : 'Save Changes'}
               </button>

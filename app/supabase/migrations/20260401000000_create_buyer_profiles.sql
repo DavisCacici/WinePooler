@@ -26,4 +26,4 @@ CREATE POLICY "Buyer can insert own profile"
 
 CREATE POLICY "Buyer can update own profile"
   ON public.buyer_profiles FOR UPDATE
-  USING (auth.uid() = user_id);
+  USING ((( SELECT auth.uid() AS uid) = user_id));

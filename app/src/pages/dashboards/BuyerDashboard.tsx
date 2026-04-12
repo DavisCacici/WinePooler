@@ -70,7 +70,7 @@ export const isPalletPreferred = (
 }
 
 const BuyerDashboard = () => {
-  const [view, setView] = useState<'map' | 'grid'>('map')
+  // const [view, setView] = useState<'map' | 'grid'>('map')
   const [areaId, setAreaId] = useState<string | null>(null)
   const [activeAreaName, setActiveAreaName] = useState<string | null>(null)
   const [pallets, setPallets] = useState<BuyerPalletCard[]>([])
@@ -440,82 +440,17 @@ const BuyerDashboard = () => {
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="rounded-full bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+                className="rounded-full border border-accent-buyer bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
                 + New Pallet
               </button>
-              <div className="flex gap-2 rounded-full bg-surface-alt p-1">
-              <button
-                type="button"
-                onClick={() => setView('map')}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'map' ? 'bg-surface text-primary shadow-sm' : 'text-secondary'}`}
-              >
-                Map View
-              </button>
-              <button
-                type="button"
-                onClick={() => setView('grid')}
-                className={`rounded-full px-4 py-2 text-sm font-medium ${view === 'grid' ? 'bg-surface text-primary shadow-sm' : 'text-secondary'}`}
-              >
-                Grid View
-              </button>
-              </div>
             </div>
           </div>
 
           {loadingPallets && <p className="mt-4 text-sm text-secondary">Loading pallets...</p>}
 
-          {view === 'map' ? (
-            <div className="mt-6 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-              <div className="rounded-3xl bg-gradient-to-br from-success-bg via-surface to-info-bg p-6">
-                <h3 className="text-lg font-semibold text-primary">Map View</h3>
-                <div className="mt-5 grid gap-4 md:grid-cols-3">
-                  {visiblePallets.map(pallet => (
-                    <article
-                      key={pallet.id}
-                      className={`rounded-2xl bg-surface/90 p-4 shadow-sm ${
-                        isPalletPreferred(pallet, preferences) ? 'ring-2 ring-accent-buyer' : ''
-                      }`}
-                    >
-                      <p className="text-xs font-semibold uppercase tracking-wide text-accent-buyer">{pallet.area}</p>
-                      <p className="mt-2 text-base font-semibold text-primary">{pallet.winery}</p>
-                      <p className="mt-1 text-sm text-secondary">Progress {pallet.progressUnitLabel}</p>
-                      <PalletPricingBadge bulkPrice={pallet.bulkPrice} retailPrice={pallet.retailPrice} unitPrices={pallet.unitPrices} compact />
-                      <InventoryStatusBadge
-                        availableStock={pallet.availableStock}
-                        allocatedBottles={pallet.allocatedBottles}
-                        totalStock={pallet.totalStock}
-                        syncError={pallet.inventorySyncError}
-                      />
-                      {pallet.state !== 'open' && (
-                        <span className="mt-2 inline-block rounded-full bg-surface-elevated px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-secondary">
-                          {pallet.state}
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        disabled={pallet.state !== 'open' || (pallet.availableStock !== null && pallet.availableStock <= 0)}
-                        onClick={() => setActivePalletForOrder(pallet)}
-                        className="mt-3 w-full rounded-full bg-accent-buyer px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Add Order
-                      </button>
-                    </article>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-3xl bg-[var(--color-notification-surface)] p-6 text-[var(--color-notification-text)]">
-                <h3 className="text-lg font-semibold">Area demand snapshot</h3>
-                <ul className="mt-4 space-y-3 text-sm opacity-80">
-                  <li>North Milan demand spike: +18% week over week</li>
-                  <li>Lake Garda pallet ETA: 2 days to freeze</li>
-                  <li>Turin Center has the fastest fill velocity</li>
-                </ul>
-              </div>
-            </div>
-          ) : (
+    
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-primary">Grid View</h3>
               <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {visiblePallets.map(pallet => (
                   <article
@@ -557,7 +492,6 @@ const BuyerDashboard = () => {
                 ))}
               </div>
             </div>
-          )}
         </section>
 
         {showCreateModal && user && areaId && (

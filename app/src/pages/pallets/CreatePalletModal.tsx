@@ -6,6 +6,7 @@ import {
   getOpenPalletForWinery,
 } from '../../lib/supabase/queries/virtualPallets'
 import { computePalletThreshold } from '../../lib/supabase/queries/sellingUnits'
+import { createPortal } from 'react-dom'
 
 interface CreatePalletModalProps {
   areaId: string
@@ -124,8 +125,8 @@ const CreatePalletModal = ({
     }
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
       <div className="w-full max-w-lg rounded-3xl bg-surface p-8 shadow-xl ring-1 ring-border">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -256,14 +257,15 @@ const CreatePalletModal = ({
             <button
               type="submit"
               disabled={submitting || loadingWineries || Boolean(loadingError)}
-              className="rounded-full bg-accent-buyer px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+              className="rounded-full border border-accent-buyer bg-accent-buyer px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
             >
               {submitting ? 'Creating...' : 'Create Pallet'}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
