@@ -1,0 +1,27 @@
+{
+  "create": {
+    "cta": "Create Pallet",
+    "heading": "Start a new virtual pallet",
+    "macroArea": "Macro-Area",
+    "currentArea": "Current area",
+    "winery": "Winery",
+    "loadingWineries": "Loading wineries...",
+    "bulkPricePerBottle": "Bulk Price (€/bottle)",
+    "retailPricePerBottle": "Retail Price (€/bottle)",
+    "bulkPricePlaceholder": "e.g. 8.50",
+    "retailPricePlaceholder": "e.g. 14.00",
+    "createButton": "Create Pallet",
+    "creating": "Creating...",
+    "viewExistingOpenPallet": "View existing open pallet",
+    "thresholdBottle": "This pallet will hold {{count}} bottle",
+    "thresholdBottle_other": "This pallet will hold {{count}} bottles",
+    "thresholdDisplayUnit": "This pallet will hold {{displayCount}} {{displayUnitLabel}} ({{bottleCount}} bottles)",
+    "successCreated": "Virtual pallet created for {{wineryName}}.",
+    "errors": {
+      "loadWineries": "Failed to load wineries. Please retry.",
+      "selectWinery": "Please select a winery.",
+      "openPalletExists": "An open pallet already exists for this winery in your area.",
+      "createFailed": "Unable to create pallet. Please try again."
+    }
+  }
+}

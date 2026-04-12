@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { getBuyerProfile } from '../../lib/supabase/queries/buyerProfile'
 import { getBuyerPreferences, type BuyerPreferences } from '../../lib/supabase/queries/buyerPreferences'
@@ -45,11 +46,11 @@ interface PalletFreezeNotification {
 }
 
 const buyerNavigation = [
-  'Active Pallets',
-  'Area Demand',
-  'My Orders',
-  'Saved Wineries',
-  'Preferences',
+  'activePallets',
+  'areaDemand',
+  'myOrders',
+  'savedWineries',
+  'preferences',
 ]
 
 export const isPalletPreferred = (
@@ -83,6 +84,7 @@ const BuyerDashboard = () => {
   const [preferences, setPreferences] = useState<BuyerPreferences | null>(null)
   const [preferencesLoaded, setPreferencesLoaded] = useState(false)
   const { user } = useAuth()
+  const { t, i18n } = useTranslation('buyerDashboard')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -184,7 +186,7 @@ const BuyerDashboard = () => {
             id: row.id,
             palletId: row.id,
             area: row.area_name ?? activeAreaName ?? '',
-            winery: row.winery_name ?? 'Unknown winery',
+            winery: row.winery_name ?? t('card.unknownWinery'),
             wineryId: row.winery_id,
             progress: palletProgressLabel(row.bottle_count, row.threshold),
             progressUnitLabel: palletProgressUnitLabel(
@@ -226,7 +228,7 @@ const BuyerDashboard = () => {
     return () => {
       isMounted = false
     }
-  }, [areaId, palletRefreshToken, activeAreaName])
+  }, [areaId, palletRefreshToken, activeAreaName, t, i18n.language])
 
   // Keep palletsRef in sync so the Realtime handler always sees fresh state
   useEffect(() => {
@@ -378,29 +380,29 @@ const BuyerDashboard = () => {
       <div className="mx-auto max-w-6xl space-y-8">
         <header className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">
-            Buyer Dashboard · {activeAreaName ?? 'All Areas'}
+            {t('header.badge', { areaName: activeAreaName ?? t('header.allAreas') })}
           </p>
           {hasPreferences && (
             <span className="mt-3 inline-flex rounded-full border border-success-border bg-success-bg px-3 py-1 text-xs font-medium text-success-text">
-              Preferences set
+              {t('header.preferencesSet')}
             </span>
           )}
           <div className="mt-3 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-primary">Map active pallets and switch to grid detail</h1>
+              <h1 className="text-3xl font-bold text-primary">{t('header.title')}</h1>
               <p className="mt-2 max-w-2xl text-secondary">
-                Monitor area-wide demand, compare pallet progress, and move quickly from geography to order-ready inventory.
+                {t('header.subtitle')}
               </p>
             </div>
-            <nav aria-label="Buyer dashboard navigation" className="flex flex-wrap gap-3">
+            <nav aria-label={t('nav.ariaLabel')} className="flex flex-wrap gap-3">
               {buyerNavigation.map(item => (
-                item === 'Preferences' ? (
+                item === 'preferences' ? (
                   <Link
                     key={item}
                     to="/profile/preferences"
                     className="rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-secondary"
                   >
-                    {item}
+                    {t(`nav.${item}`)}
                   </Link>
                 ) : (
                   <a
@@ -408,7 +410,7 @@ const BuyerDashboard = () => {
                     href="#"
                     className="rounded-full border border-border bg-surface-alt px-4 py-2 text-sm font-medium text-secondary"
                   >
-                    {item}
+                    {t(`nav.${item}`)}
                   </a>
                 )
               ))}
@@ -416,16 +418,16 @@ const BuyerDashboard = () => {
                 to="/profile/area"
                 className="rounded-full border border-success-border bg-success-bg px-4 py-2 text-sm font-medium text-success-text"
               >
-                Change Area
+                {t('nav.changeArea')}
               </Link>
             </nav>
           </div>
           {preferencesLoaded && preferences === null && (
             <p className="mt-3 text-sm text-secondary">
               <Link to="/profile/preferences" className="text-accent-buyer underline">
-                Set preferences
+                {t('preferences.setPreferences')}
               </Link>{' '}
-              to highlight matching pallets.
+              {t('preferences.highlightHint')}
             </p>
           )}
         </header>
@@ -433,8 +435,8 @@ const BuyerDashboard = () => {
         <section className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-primary">Pallet discovery</h2>
-              <p className="text-sm text-secondary">Toggle between macro-area map view and pallet grid view.</p>
+              <h2 className="text-xl font-semibold text-primary">{t('discovery.title')}</h2>
+              <p className="text-sm text-secondary">{t('discovery.subtitle')}</p>
             </div>
             <div className="flex items-center gap-3">
               <button
@@ -442,12 +444,12 @@ const BuyerDashboard = () => {
                 onClick={() => setShowCreateModal(true)}
                 className="rounded-full border border-accent-buyer bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
-                + New Pallet
+                {t('discovery.newPallet')}
               </button>
             </div>
           </div>
 
-          {loadingPallets && <p className="mt-4 text-sm text-secondary">Loading pallets...</p>}
+          {loadingPallets && <p className="mt-4 text-sm text-secondary">{t('loadingPallets')}</p>}
 
     
             <div className="mt-6">
@@ -463,7 +465,7 @@ const BuyerDashboard = () => {
                       <p className="text-xs font-semibold uppercase tracking-wide text-accent-buyer">{pallet.id}</p>
                       {pallet.state !== 'open' && (
                         <span className="rounded-full bg-surface-elevated px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-secondary">
-                          {pallet.state}
+                          {t(`state.${pallet.state}`)}
                         </span>
                       )}
                     </div>
@@ -486,7 +488,7 @@ const BuyerDashboard = () => {
                       onClick={() => setActivePalletForOrder(pallet)}
                       className="mt-4 w-full rounded-full bg-accent-buyer px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      Add Order
+                      {t('card.addOrder')}
                     </button>
                   </article>
                 ))}

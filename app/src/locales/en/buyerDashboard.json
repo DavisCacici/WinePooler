@@ -1,0 +1,37 @@
+{
+  "header": {
+    "badge": "Buyer Dashboard · {{areaName}}",
+    "allAreas": "All Areas",
+    "preferencesSet": "Preferences set",
+    "title": "Map active pallets and switch to grid detail",
+    "subtitle": "Monitor area-wide demand, compare pallet progress, and move quickly from geography to order-ready inventory."
+  },
+  "nav": {
+    "ariaLabel": "Buyer dashboard navigation",
+    "activePallets": "Active Pallets",
+    "areaDemand": "Area Demand",
+    "myOrders": "My Orders",
+    "savedWineries": "Saved Wineries",
+    "preferences": "Preferences",
+    "changeArea": "Change Area"
+  },
+  "preferences": {
+    "setPreferences": "Set preferences",
+    "highlightHint": "to highlight matching pallets."
+  },
+  "discovery": {
+    "title": "Pallet discovery",
+    "subtitle": "Toggle between macro-area map view and pallet grid view.",
+    "newPallet": "+ New Pallet"
+  },
+  "loadingPallets": "Loading pallets...",
+  "card": {
+    "unknownWinery": "Unknown winery",
+    "addOrder": "Add Order"
+  },
+  "state": {
+    "open": "open",
+    "frozen": "frozen",
+    "completed": "completed"
+  }
+}

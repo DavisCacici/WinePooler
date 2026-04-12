@@ -1,0 +1,27 @@
+{
+  "create": {
+    "cta": "Crea pallet",
+    "heading": "Avvia un nuovo pallet virtuale",
+    "macroArea": "Macro-area",
+    "currentArea": "Area corrente",
+    "winery": "Cantina",
+    "loadingWineries": "Caricamento cantine...",
+    "bulkPricePerBottle": "Prezzo all'ingrosso (€/bottiglia)",
+    "retailPricePerBottle": "Prezzo al dettaglio (€/bottiglia)",
+    "bulkPricePlaceholder": "es. 8.50",
+    "retailPricePlaceholder": "es. 14.00",
+    "createButton": "Crea pallet",
+    "creating": "Creazione in corso...",
+    "viewExistingOpenPallet": "Visualizza pallet aperto esistente",
+    "thresholdBottle": "Questo pallet conterra {{count}} bottiglia",
+    "thresholdBottle_other": "Questo pallet conterra {{count}} bottiglie",
+    "thresholdDisplayUnit": "Questo pallet conterra {{displayCount}} {{displayUnitLabel}} ({{bottleCount}} bottiglie)",
+    "successCreated": "Pallet virtuale creato per {{wineryName}}.",
+    "errors": {
+      "loadWineries": "Impossibile caricare le cantine. Riprova.",
+      "selectWinery": "Seleziona una cantina.",
+      "openPalletExists": "Esiste gia un pallet aperto per questa cantina nella tua area.",
+      "createFailed": "Impossibile creare il pallet. Riprova."
+    }
+  }
+}

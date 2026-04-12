@@ -1,0 +1,37 @@
+{
+  "header": {
+    "badge": "Dashboard Buyer · {{areaName}}",
+    "allAreas": "Tutte le aree",
+    "preferencesSet": "Preferenze impostate",
+    "title": "Mappa i pallet attivi e passa alla griglia dettagliata",
+    "subtitle": "Monitora la domanda dell'area, confronta l'avanzamento dei pallet e passa rapidamente dalla geografia all'inventario pronto all'ordine."
+  },
+  "nav": {
+    "ariaLabel": "Navigazione dashboard buyer",
+    "activePallets": "Pallet attivi",
+    "areaDemand": "Domanda area",
+    "myOrders": "I miei ordini",
+    "savedWineries": "Cantine salvate",
+    "preferences": "Preferenze",
+    "changeArea": "Cambia area"
+  },
+  "preferences": {
+    "setPreferences": "Imposta preferenze",
+    "highlightHint": "per evidenziare i pallet corrispondenti."
+  },
+  "discovery": {
+    "title": "Scoperta pallet",
+    "subtitle": "Passa dalla vista mappa per macro-area alla vista griglia pallet.",
+    "newPallet": "+ Nuovo pallet"
+  },
+  "loadingPallets": "Caricamento pallet...",
+  "card": {
+    "unknownWinery": "Cantina sconosciuta",
+    "addOrder": "Aggiungi ordine"
+  },
+  "state": {
+    "open": "aperto",
+    "frozen": "congelato",
+    "completed": "completato"
+  }
+}

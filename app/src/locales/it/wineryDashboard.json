@@ -1,0 +1,64 @@
+{
+  "header": {
+    "portal": "Portale cantina",
+    "title": "Monitora le performance dei pallet e prepara le picking list",
+    "subtitle": "Controlla analisi ricavi, individua i picchi di domanda e porta ogni pallet congelato in esecuzione di magazzino."
+  },
+  "analyticsCards": {
+    "netPayouts": {
+      "label": "Pagamenti netti",
+      "detail": "{{count}} pallet pagati"
+    },
+    "platformFees": {
+      "label": "Commissioni piattaforma",
+      "detail": "Commissione applicata"
+    },
+    "frozenPallets": {
+      "label": "Pallet congelati",
+      "detail": "{{count}} ancora aperti"
+    }
+  },
+  "analytics": {
+    "title": "Dashboard analitica",
+    "highlights": {
+      "strongDemand": "La domanda buyer e piu forte tra Milano Nord e Torino Centro.",
+      "fillVelocity": "La velocita media di riempimento pallet e migliorata del 9% dopo campagne buyer aggregate.",
+      "underAllocated": "Due SKU premium sono sotto-allocati e andrebbero riforniti."
+    }
+  },
+  "picking": {
+    "title": "Picking list",
+    "subtitle": "Vista operativa per pallet pronti per l'azione di magazzino.",
+    "table": {
+      "pallet": "Pallet",
+      "destination": "Destinazione",
+      "bottles": "Bottiglie",
+      "allocatedTotal": "Allocate / Totale",
+      "status": "Stato",
+      "payout": "Pagamento",
+      "actions": "Azioni"
+    },
+    "loading": "Caricamento picking list...",
+    "empty": "Nessun pallet pronto per il picking",
+    "notAvailable": "-"
+  },
+  "state": {
+    "readyToPick": "Pronto al picking",
+    "completed": "Completato",
+    "open": "Aperto"
+  },
+  "payoutStatus": {
+    "processing": "In elaborazione",
+    "failed": "Fallito"
+  },
+  "actions": {
+    "processing": "Elaborazione...",
+    "confirmShipped": "Conferma spedito",
+    "retrying": "Riprovo...",
+    "retryPayout": "Riprova pagamento"
+  },
+  "errors": {
+    "confirmFulfillment": "Impossibile confermare l'evasione",
+    "retryPayout": "Impossibile riprovare il pagamento"
+  }
+}

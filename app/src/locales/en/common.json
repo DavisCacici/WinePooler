@@ -1,0 +1,8 @@
+{
+  "appName": "WinePooler",
+  "actions": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "retry": "Retry"
+  }
+}

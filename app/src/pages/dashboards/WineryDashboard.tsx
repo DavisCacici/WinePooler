@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { getWineryPickingList, type PickingListRow } from '../../lib/supabase/queries/virtualPallets'
 import { confirmPalletFulfillment, retryPalletPayout } from '../../lib/supabase/queries/payouts'
@@ -10,6 +11,7 @@ const formatEur = (cents: number) =>
   new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(cents / 100)
 
 const WineryDashboard = () => {
+  const { t } = useTranslation('wineryDashboard')
   const { user } = useAuth()
   const [pickingLists, setPickingLists] = useState<PickingListRow[]>([])
   const [loadingPicking, setLoadingPicking] = useState(false)
@@ -67,7 +69,7 @@ const WineryDashboard = () => {
       await confirmPalletFulfillment(palletId)
       if (wineryProfileId) refreshPickingList(wineryProfileId)
     } catch (err: any) {
-      setActionError(err?.message ?? 'Failed to confirm fulfillment')
+      setActionError(err?.message ?? t('errors.confirmFulfillment'))
     } finally {
       setActionLoading(null)
     }
@@ -80,7 +82,7 @@ const WineryDashboard = () => {
       await retryPalletPayout(palletId)
       if (wineryProfileId) refreshPickingList(wineryProfileId)
     } catch (err: any) {
-      setActionError(err?.message ?? 'Failed to retry payout')
+      setActionError(err?.message ?? t('errors.retryPayout'))
     } finally {
       setActionLoading(null)
     }
@@ -98,19 +100,31 @@ const WineryDashboard = () => {
   const openCount = pickingLists.filter(p => p.state === 'open').length
 
   const dynamicAnalyticsCards = [
-    { label: 'Net payouts', value: formatEur(netPayoutsCents), detail: `${pickingLists.filter(p => p.payout_status === 'paid').length} paid pallets` },
-    { label: 'Platform fees', value: formatEur(totalFeesCents), detail: 'Commission charged' },
-    { label: 'Frozen pallets', value: String(frozenCount), detail: `${openCount} still open` },
+    {
+      label: t('analyticsCards.netPayouts.label'),
+      value: formatEur(netPayoutsCents),
+      detail: t('analyticsCards.netPayouts.detail', { count: pickingLists.filter(p => p.payout_status === 'paid').length }),
+    },
+    {
+      label: t('analyticsCards.platformFees.label'),
+      value: formatEur(totalFeesCents),
+      detail: t('analyticsCards.platformFees.detail'),
+    },
+    {
+      label: t('analyticsCards.frozenPallets.label'),
+      value: String(frozenCount),
+      detail: t('analyticsCards.frozenPallets.detail', { count: openCount }),
+    },
   ]
 
   return (
     <div className="px-6 py-8">
       <div className="mx-auto max-w-6xl space-y-8">
         <header className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-winery">Winery Portal</p>
-          <h1 className="mt-3 text-3xl font-bold text-primary">Track pallet performance and prepare picking lists</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-winery">{t('header.portal')}</p>
+          <h1 className="mt-3 text-3xl font-bold text-primary">{t('header.title')}</h1>
           <p className="mt-2 max-w-3xl text-secondary">
-            Review revenue analytics, identify demand hotspots, and move each frozen pallet into warehouse execution.
+            {t('header.subtitle')}
           </p>
         </header>
 
@@ -126,43 +140,43 @@ const WineryDashboard = () => {
 
         <section className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
           <article className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
-            <h2 className="text-xl font-semibold text-primary">Analytics dashboard</h2>
+            <h2 className="text-xl font-semibold text-primary">{t('analytics.title')}</h2>
             <ul className="mt-4 space-y-4 text-sm text-secondary">
-              <li>Buyer demand is strongest in North Milan and Turin Center.</li>
-              <li>Average pallet fill velocity improved by 9% after grouped buyer campaigns.</li>
-              <li>Two premium SKUs are under-allocated and should be restocked.</li>
+              <li>{t('analytics.highlights.strongDemand')}</li>
+              <li>{t('analytics.highlights.fillVelocity')}</li>
+              <li>{t('analytics.highlights.underAllocated')}</li>
             </ul>
           </article>
 
           <article className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-primary">Picking lists</h2>
-                <p className="text-sm text-secondary">Operational view for pallets that are ready for warehouse action.</p>
+                <h2 className="text-xl font-semibold text-primary">{t('picking.title')}</h2>
+                <p className="text-sm text-secondary">{t('picking.subtitle')}</p>
               </div>
             </div>
             <div className="mt-5 overflow-hidden rounded-2xl border border-border">
               <table className="min-w-full divide-y divide-border text-sm">
                 <thead className="bg-surface-alt text-left text-secondary">
                   <tr>
-                    <th className="px-4 py-3 font-medium">Pallet</th>
-                    <th className="px-4 py-3 font-medium">Destination</th>
-                    <th className="px-4 py-3 font-medium">Bottles</th>
-                    <th className="px-4 py-3 font-medium">Allocated / Total</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Payout</th>
-                    <th className="px-4 py-3 font-medium">Actions</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.pallet')}</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.destination')}</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.bottles')}</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.allocatedTotal')}</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.status')}</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.payout')}</th>
+                    <th className="px-4 py-3 font-medium">{t('picking.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border bg-surface text-primary">
                   {loadingPicking && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-3 text-center text-muted">Loading picking lists...</td>
+                      <td colSpan={7} className="px-4 py-3 text-center text-muted">{t('picking.loading')}</td>
                     </tr>
                   )}
                   {!loadingPicking && pickingLists.length === 0 && (
                     <tr>
-                      <td colSpan={7} className="px-4 py-3 text-center text-muted">No pallets ready for picking</td>
+                      <td colSpan={7} className="px-4 py-3 text-center text-muted">{t('picking.empty')}</td>
                     </tr>
                   )}
                   {pickingLists.map(item => (
@@ -173,7 +187,7 @@ const WineryDashboard = () => {
                       <td className="px-4 py-3">
                         {item.allocated_bottles !== null && item.total_stock !== null
                           ? `${item.allocated_bottles} / ${item.total_stock}`
-                          : '—'}
+                          : t('picking.notAvailable')}
                       </td>
                       <td className="px-4 py-3">
                         <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -183,7 +197,7 @@ const WineryDashboard = () => {
                             ? 'bg-surface-elevated text-secondary'
                             : 'bg-success-bg text-success-text'
                         }`}>
-                          {item.state === 'frozen' ? 'Ready to pick' : item.state === 'completed' ? 'Completed' : 'Open'}
+                          {item.state === 'frozen' ? t('state.readyToPick') : item.state === 'completed' ? t('state.completed') : t('state.open')}
                         </span>
                       </td>
                       <td className="px-4 py-3">
@@ -192,11 +206,11 @@ const WineryDashboard = () => {
                             {formatEur(item.payout_net_cents)}
                           </span>
                         ) : item.payout_status === 'processing' ? (
-                          <span className="rounded-full bg-warning-bg px-2 py-0.5 text-xs font-medium text-warning-text">Processing</span>
+                          <span className="rounded-full bg-warning-bg px-2 py-0.5 text-xs font-medium text-warning-text">{t('payoutStatus.processing')}</span>
                         ) : item.payout_status === 'failed' ? (
-                          <span className="rounded-full bg-error-bg px-2 py-0.5 text-xs font-medium text-error-text">Failed</span>
+                          <span className="rounded-full bg-error-bg px-2 py-0.5 text-xs font-medium text-error-text">{t('payoutStatus.failed')}</span>
                         ) : (
-                          <span className="text-xs text-muted">—</span>
+                          <span className="text-xs text-muted">{t('picking.notAvailable')}</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -207,7 +221,7 @@ const WineryDashboard = () => {
                             disabled={actionLoading === item.id}
                             className="rounded-full bg-accent-winery px-3 py-1 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50"
                           >
-                            {actionLoading === item.id ? 'Processing…' : 'Confirm Shipped'}
+                            {actionLoading === item.id ? t('actions.processing') : t('actions.confirmShipped')}
                           </button>
                         )}
                         {item.payout_status === 'failed' && (
@@ -217,7 +231,7 @@ const WineryDashboard = () => {
                             disabled={actionLoading === item.id}
                             className="rounded-full border border-error-border bg-surface px-3 py-1 text-xs font-medium text-error hover:bg-error-bg disabled:opacity-50"
                           >
-                            {actionLoading === item.id ? 'Retrying…' : 'Retry Payout'}
+                            {actionLoading === item.id ? t('actions.retrying') : t('actions.retryPayout')}
                           </button>
                         )}
                       </td>

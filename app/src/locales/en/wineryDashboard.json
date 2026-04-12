@@ -1,0 +1,64 @@
+{
+  "header": {
+    "portal": "Winery Portal",
+    "title": "Track pallet performance and prepare picking lists",
+    "subtitle": "Review revenue analytics, identify demand hotspots, and move each frozen pallet into warehouse execution."
+  },
+  "analyticsCards": {
+    "netPayouts": {
+      "label": "Net payouts",
+      "detail": "{{count}} paid pallets"
+    },
+    "platformFees": {
+      "label": "Platform fees",
+      "detail": "Commission charged"
+    },
+    "frozenPallets": {
+      "label": "Frozen pallets",
+      "detail": "{{count}} still open"
+    }
+  },
+  "analytics": {
+    "title": "Analytics dashboard",
+    "highlights": {
+      "strongDemand": "Buyer demand is strongest in North Milan and Turin Center.",
+      "fillVelocity": "Average pallet fill velocity improved by 9% after grouped buyer campaigns.",
+      "underAllocated": "Two premium SKUs are under-allocated and should be restocked."
+    }
+  },
+  "picking": {
+    "title": "Picking lists",
+    "subtitle": "Operational view for pallets that are ready for warehouse action.",
+    "table": {
+      "pallet": "Pallet",
+      "destination": "Destination",
+      "bottles": "Bottles",
+      "allocatedTotal": "Allocated / Total",
+      "status": "Status",
+      "payout": "Payout",
+      "actions": "Actions"
+    },
+    "loading": "Loading picking lists...",
+    "empty": "No pallets ready for picking",
+    "notAvailable": "-"
+  },
+  "state": {
+    "readyToPick": "Ready to pick",
+    "completed": "Completed",
+    "open": "Open"
+  },
+  "payoutStatus": {
+    "processing": "Processing",
+    "failed": "Failed"
+  },
+  "actions": {
+    "processing": "Processing...",
+    "confirmShipped": "Confirm Shipped",
+    "retrying": "Retrying...",
+    "retryPayout": "Retry Payout"
+  },
+  "errors": {
+    "confirmFulfillment": "Failed to confirm fulfillment",
+    "retryPayout": "Failed to retry payout"
+  }
+}
