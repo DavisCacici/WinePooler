@@ -1,0 +1,47 @@
+{
+  "purchasingPreferences": {
+    "loading": "Loading preferences...",
+    "badge": "Buyer Preferences",
+    "title": "Purchasing preferences",
+    "subtitle": "Set your preferred wine types, appellations, and monthly budget to personalize pallet discovery.",
+    "sections": {
+      "wineTypes": "Preferred wine types",
+      "appellations": "Preferred appellations"
+    },
+    "wineTypes": {
+      "red": "Red",
+      "white": "White",
+      "sparkling": "Sparkling",
+      "rose": "Rose",
+      "orange": "Orange",
+      "dessert": "Dessert"
+    },
+    "appellations": {
+      "helper": "Add up to {{count}} tags. Press Enter or comma to add.",
+      "placeholder": "e.g. Barolo, Brunello",
+      "removeTag": "Remove {{tag}}"
+    },
+    "budget": {
+      "title": "Monthly budget range (EUR)",
+      "minimum": "Minimum",
+      "maximum": "Maximum"
+    },
+    "actions": {
+      "save": "Save Preferences",
+      "saving": "Saving..."
+    },
+    "success": {
+      "saved": "Preferences saved successfully."
+    },
+    "errors": {
+      "loadFailed": "Failed to load preferences.",
+      "mustBeLoggedIn": "You must be logged in to save preferences.",
+      "budgetNotNumber": "Budget values must be numbers.",
+      "minPositive": "Minimum budget must be a positive number.",
+      "maxPositive": "Maximum budget must be a positive number.",
+      "minGreaterThanMax": "Minimum budget cannot be greater than maximum budget.",
+      "appellationLimit": "You can add up to {{count}} appellations.",
+      "saveFailed": "Unable to save preferences. Please try again."
+    }
+  }
+}

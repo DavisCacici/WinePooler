@@ -1,0 +1,59 @@
+{
+  "pageTitle": "Inventario vini",
+  "loading": "Caricamento prodotti...",
+  "noProfile": "Nessun profilo cantina trovato per questo account.",
+  "header": {
+    "section": "Catalogo",
+    "title": "Inventario vini",
+    "subtitle": "Aggiungi e gestisci i tuoi prodotti vino. I buyer possono acquistare solo i prodotti che inserisci qui."
+  },
+  "stats": {
+    "products": "Prodotti",
+    "totalAvailableBottles": "Bottiglie disponibili totali"
+  },
+  "form": {
+    "addTitle": "Aggiungi prodotto vino",
+    "editTitle": "Modifica prodotto vino",
+    "wineLabel": "Etichetta vino",
+    "wineLabelPlaceholder": "es. Rosso Riserva",
+    "sku": "SKU",
+    "skuPlaceholder": "es. CAU-RR-001",
+    "totalStock": "Stock totale (bottiglie)",
+    "totalStockPlaceholder": "0",
+    "save": "Salvataggio...",
+    "addButton": "Aggiungi prodotto",
+    "updateButton": "Aggiorna prodotto",
+    "cancelEdit": "Annulla modifica"
+  },
+  "table": {
+    "title": "I tuoi prodotti",
+    "items": "{{count}} articoli",
+    "wineLabel": "Etichetta vino",
+    "sku": "SKU",
+    "totalStock": "Stock totale",
+    "allocated": "Allocate",
+    "available": "Disponibili",
+    "actions": "Azioni",
+    "empty": "Nessun prodotto ancora. Aggiungi sopra il tuo primo prodotto vino.",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "deleting": "Eliminazione..."
+  },
+  "validation": {
+    "wineLabelRequired": "L'etichetta vino e obbligatoria.",
+    "skuRequired": "Lo SKU e obbligatorio.",
+    "totalStockInvalid": "Lo stock totale deve essere un numero intero >= 0."
+  },
+  "feedback": {
+    "updated": "Prodotto vino aggiornato.",
+    "added": "Prodotto vino aggiunto.",
+    "deleted": "Prodotto vino eliminato."
+  },
+  "errors": {
+    "duplicateSku": "SKU gia presente per la tua cantina. Usa uno SKU univoco.",
+    "loadFailed": "Impossibile caricare l'inventario vini.",
+    "saveFailed": "Impossibile salvare il prodotto vino.",
+    "deleteFailed": "Impossibile eliminare il prodotto vino."
+  },
+  "confirmDelete": "Eliminare il prodotto \"{{wineLabel}}\"? Questa azione non puo essere annullata."
+}

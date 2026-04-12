@@ -1,0 +1,47 @@
+{
+  "purchasingPreferences": {
+    "loading": "Caricamento preferenze...",
+    "badge": "Preferenze Acquisto",
+    "title": "Preferenze di acquisto",
+    "subtitle": "Imposta i tipi di vino, le denominazioni e il budget mensile per personalizzare la scoperta dei pallet.",
+    "sections": {
+      "wineTypes": "Tipi di vino preferiti",
+      "appellations": "Denominazioni preferite"
+    },
+    "wineTypes": {
+      "red": "Rosso",
+      "white": "Bianco",
+      "sparkling": "Spumante",
+      "rose": "Rosato",
+      "orange": "Orange",
+      "dessert": "Dessert"
+    },
+    "appellations": {
+      "helper": "Aggiungi fino a {{count}} tag. Premi Invio o virgola per aggiungere.",
+      "placeholder": "es. Barolo, Brunello",
+      "removeTag": "Rimuovi {{tag}}"
+    },
+    "budget": {
+      "title": "Intervallo budget mensile (EUR)",
+      "minimum": "Minimo",
+      "maximum": "Massimo"
+    },
+    "actions": {
+      "save": "Salva preferenze",
+      "saving": "Salvataggio..."
+    },
+    "success": {
+      "saved": "Preferenze salvate con successo."
+    },
+    "errors": {
+      "loadFailed": "Impossibile caricare le preferenze.",
+      "mustBeLoggedIn": "Devi essere autenticato per salvare le preferenze.",
+      "budgetNotNumber": "I valori del budget devono essere numeri.",
+      "minPositive": "Il budget minimo deve essere un numero positivo.",
+      "maxPositive": "Il budget massimo deve essere un numero positivo.",
+      "minGreaterThanMax": "Il budget minimo non puo essere maggiore del massimo.",
+      "appellationLimit": "Puoi aggiungere fino a {{count}} denominazioni.",
+      "saveFailed": "Impossibile salvare le preferenze. Riprova."
+    }
+  }
+}

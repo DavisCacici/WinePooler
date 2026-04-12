@@ -1,16 +1,18 @@
 import { forwardRef } from 'react'
 import type { ButtonHTMLAttributes } from 'react'
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'
-type ButtonSize = 'sm' | 'md' | 'lg'
+type ButtonVariant = 'null' | 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline'
+type ButtonSize = 'null' | 'sm' | 'md' | 'lg'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   size?: ButtonSize
   loading?: boolean
+  customStyles?: boolean
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
+  null: '',
   primary: 'bg-primary text-primary-text hover:bg-primary-hover active:bg-primary-active disabled:opacity-50',
   secondary: 'bg-surface-elevated text-primary border border-border hover:bg-surface-alt disabled:opacity-50',
   danger: 'bg-error text-white hover:opacity-90 disabled:opacity-50',
@@ -19,18 +21,33 @@ const variantClasses: Record<ButtonVariant, string> = {
 }
 
 const sizeClasses: Record<ButtonSize, string> = {
+  null: '',
   sm: 'px-3 py-1.5 text-xs rounded-full',
   md: 'px-4 py-2 text-sm rounded-full',
   lg: 'px-6 py-2.5 text-sm rounded-full',
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', loading = false, disabled, className = '', children, ...rest }, ref) => {
+  ({ variant = 'primary', size = 'md', loading = false, disabled, customStyles = false, className = '', children, ...rest }, ref) => {
     return (
       <button
         ref={ref}
         disabled={disabled || loading}
-        className={`inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+        className={`
+          ${customStyles ? '' 
+            : `inline-flex 
+              items-center 
+              justify-center 
+              font-medium 
+              transition-colors 
+              focus:outline-none 
+              focus:ring-2 
+              focus:ring-focus 
+              focus:ring-offset-2 
+              border 
+              ${variantClasses[variant]} 
+              ${sizeClasses[size]} `}
+            ${className} `}
         {...rest}
       >
         {loading && (

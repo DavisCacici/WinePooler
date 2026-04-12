@@ -9,6 +9,7 @@ import ProtectedDashboardRoute from './pages/dashboards/ProtectedDashboardRoute'
 import BuyerProfileForm from './pages/profile/BuyerProfileForm'
 import AreaSelectionPage from './pages/profile/AreaSelectionPage'
 import PurchasingPreferencesForm from './pages/profile/PurchasingPreferencesForm'
+import WineInventoryPage from './pages/winery/WineInventoryPage'
 import { AuthProvider } from './lib/supabase/AuthContext'
 import { ThemeProvider } from './lib/theme/ThemeContext'
 import LayoutShell from './components/layout/LayoutShell'
@@ -43,6 +44,16 @@ const App = () => {
               <ProtectedDashboardRoute allowedRole="winery">
                 <LayoutShell>
                   <WineryDashboard />
+                </LayoutShell>
+              </ProtectedDashboardRoute>
+            }
+          />
+          <Route
+            path="/dashboard/winery/inventory"
+            element={
+              <ProtectedDashboardRoute allowedRole="winery">
+                <LayoutShell>
+                  <WineInventoryPage />
                 </LayoutShell>
               </ProtectedDashboardRoute>
             }

@@ -1,0 +1,59 @@
+{
+  "pageTitle": "Wine Inventory",
+  "loading": "Loading your products...",
+  "noProfile": "No winery profile found for this account.",
+  "header": {
+    "section": "Catalog",
+    "title": "Wine Inventory",
+    "subtitle": "Add and manage your wine products. Buyers can only purchase products you add here."
+  },
+  "stats": {
+    "products": "Products",
+    "totalAvailableBottles": "Total Available Bottles"
+  },
+  "form": {
+    "addTitle": "Add Wine Product",
+    "editTitle": "Edit Wine Product",
+    "wineLabel": "Wine Label",
+    "wineLabelPlaceholder": "e.g. Rosso Riserva",
+    "sku": "SKU",
+    "skuPlaceholder": "e.g. CAU-RR-001",
+    "totalStock": "Total Stock (bottles)",
+    "totalStockPlaceholder": "0",
+    "save": "Saving...",
+    "addButton": "Add Product",
+    "updateButton": "Update Product",
+    "cancelEdit": "Cancel Edit"
+  },
+  "table": {
+    "title": "Your Products",
+    "items": "{{count}} items",
+    "wineLabel": "Wine Label",
+    "sku": "SKU",
+    "totalStock": "Total Stock",
+    "allocated": "Allocated",
+    "available": "Available",
+    "actions": "Actions",
+    "empty": "No products yet. Add your first wine product above.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting..."
+  },
+  "validation": {
+    "wineLabelRequired": "Wine label is required.",
+    "skuRequired": "SKU is required.",
+    "totalStockInvalid": "Total stock must be a whole number >= 0."
+  },
+  "feedback": {
+    "updated": "Wine product updated.",
+    "added": "Wine product added.",
+    "deleted": "Wine product deleted."
+  },
+  "errors": {
+    "duplicateSku": "SKU already exists for your winery. Please use a unique SKU.",
+    "loadFailed": "Unable to load wine inventory.",
+    "saveFailed": "Failed to save wine product.",
+    "deleteFailed": "Failed to delete wine product."
+  },
+  "confirmDelete": "Delete product \"{{wineLabel}}\"? This action cannot be undone."
+}

@@ -28,30 +28,30 @@ describe('PurchasingPreferencesForm', () => {
 
   it('shows validation error when minimum budget exceeds maximum', async () => {
     renderForm()
-    await screen.findByText(/purchasing preferences/i)
+    await screen.findByText(/purchasing preferences|preferenze di acquisto/i)
 
-    fireEvent.change(screen.getByLabelText(/minimum/i), { target: { value: '500' } })
-    fireEvent.change(screen.getByLabelText(/maximum/i), { target: { value: '200' } })
+    fireEvent.change(screen.getByLabelText(/minimum|minimo/i), { target: { value: '500' } })
+    fireEvent.change(screen.getByLabelText(/maximum|massimo/i), { target: { value: '200' } })
 
     expect(
-      screen.getByText(/minimum budget cannot be greater than maximum budget/i)
+      screen.getByText(/minimum budget cannot be greater than maximum budget|il budget minimo non puo essere maggiore del massimo/i)
     ).toBeInTheDocument()
   })
 
   it('shows validation error for non-positive values', async () => {
     renderForm()
-    await screen.findByText(/purchasing preferences/i)
+    await screen.findByText(/purchasing preferences|preferenze di acquisto/i)
 
-    fireEvent.change(screen.getByLabelText(/minimum/i), { target: { value: '0' } })
+    fireEvent.change(screen.getByLabelText(/minimum|minimo/i), { target: { value: '0' } })
 
-    expect(screen.getByText(/minimum budget must be a positive number/i)).toBeInTheDocument()
+    expect(screen.getByText(/minimum budget must be a positive number|il budget minimo deve essere un numero positivo/i)).toBeInTheDocument()
   })
 
   it('enforces appellation limit of 10 tags', async () => {
     renderForm()
-    await screen.findByText(/purchasing preferences/i)
+    await screen.findByText(/purchasing preferences|preferenze di acquisto/i)
 
-    const input = screen.getByPlaceholderText(/e\.g\. Barolo, Brunello/i)
+    const input = screen.getByPlaceholderText(/e\.g\. Barolo, Brunello|es\. Barolo, Brunello/i)
 
     for (let index = 1; index <= 10; index += 1) {
       fireEvent.change(input, { target: { value: `Tag ${index}` } })
@@ -61,7 +61,7 @@ describe('PurchasingPreferencesForm', () => {
     fireEvent.change(input, { target: { value: 'Tag 11' } })
     fireEvent.keyDown(input, { key: 'Enter' })
 
-    expect(screen.getByText(/you can add up to 10 appellations/i)).toBeInTheDocument()
+    expect(screen.getByText(/you can add up to 10 appellations|puoi aggiungere fino a 10 denominazioni/i)).toBeInTheDocument()
   })
 
   it('pre-fills existing preferences from supabase', async () => {
@@ -76,10 +76,10 @@ describe('PurchasingPreferencesForm', () => {
     renderForm()
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Minimum')).toHaveValue(100)
-      expect(screen.getByLabelText('Maximum')).toHaveValue(400)
+      expect(screen.getByLabelText(/minimum|minimo/i)).toHaveValue(100)
+      expect(screen.getByLabelText(/maximum|massimo/i)).toHaveValue(400)
       expect(screen.getByText('Barolo')).toBeInTheDocument()
-      expect(screen.getByRole('checkbox', { name: 'Red' })).toBeChecked()
+      expect(screen.getByRole('checkbox', { name: /red|rosso/i })).toBeChecked()
     })
   })
 })

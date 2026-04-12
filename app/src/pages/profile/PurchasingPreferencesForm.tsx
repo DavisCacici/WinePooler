@@ -1,28 +1,32 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import {
   getBuyerPreferences,
   upsertBuyerPreferences,
   type BuyerPreferences,
 } from '../../lib/supabase/queries/buyerPreferences'
+import Button from '../../components/ui/Button'
 
 const WINE_TYPES = ['Red', 'White', 'Sparkling', 'Rose', 'Orange', 'Dessert']
 const MAX_APPELLATIONS = 10
 
+type BudgetValidationError = 'minPositive' | 'maxPositive' | 'minGreaterThanMax'
+
 export const validateBudgetRange = (
   min: number | null,
   max: number | null
-): string | null => {
+): BudgetValidationError | null => {
   if (min !== null && min <= 0) {
-    return 'Minimum budget must be a positive number.'
+    return 'minPositive'
   }
 
   if (max !== null && max <= 0) {
-    return 'Maximum budget must be a positive number.'
+    return 'maxPositive'
   }
 
   if (min !== null && max !== null && min > max) {
-    return 'Minimum budget cannot be greater than maximum budget.'
+    return 'minGreaterThanMax'
   }
 
   return null
@@ -30,6 +34,7 @@ export const validateBudgetRange = (
 
 const PurchasingPreferencesForm = () => {
   const { user } = useAuth()
+  const { t } = useTranslation('profile')
   const [preferredWineTypes, setPreferredWineTypes] = useState<string[]>([])
   const [preferredAppellations, setPreferredAppellations] = useState<string[]>([])
   const [tagInput, setTagInput] = useState('')
@@ -56,23 +61,24 @@ const PurchasingPreferencesForm = () => {
         setBudgetMax(prefs.monthly_budget_max?.toString() ?? '')
       })
       .catch(() => {
-        setError('Failed to load preferences.')
+        setError(t('purchasingPreferences.errors.loadFailed'))
       })
       .finally(() => {
         setLoading(false)
       })
-  }, [user])
+  }, [user, t])
 
   const budgetValidationError = useMemo(() => {
     const min = budgetMin.trim() ? Number(budgetMin) : null
     const max = budgetMax.trim() ? Number(budgetMax) : null
 
     if (Number.isNaN(min) || Number.isNaN(max)) {
-      return 'Budget values must be numbers.'
+      return t('purchasingPreferences.errors.budgetNotNumber')
     }
 
-    return validateBudgetRange(min, max)
-  }, [budgetMin, budgetMax])
+    const rangeError = validateBudgetRange(min, max)
+    return rangeError ? t(`purchasingPreferences.errors.${rangeError}`) : null
+  }, [budgetMin, budgetMax, t])
 
   const toggleWineType = (wineType: string) => {
     setPreferredWineTypes(prev =>
@@ -88,7 +94,11 @@ const PurchasingPreferencesForm = () => {
     }
 
     if (preferredAppellations.length >= MAX_APPELLATIONS) {
-      setError(`You can add up to ${MAX_APPELLATIONS} appellations.`)
+      setError(
+        t('purchasingPreferences.errors.appellationLimit', {
+          count: MAX_APPELLATIONS,
+        })
+      )
       setTagInput('')
       return
     }
@@ -120,7 +130,7 @@ const PurchasingPreferencesForm = () => {
     event.preventDefault()
 
     if (!user) {
-      setError('You must be logged in to save preferences.')
+      setError(t('purchasingPreferences.errors.mustBeLoggedIn'))
       return
     }
 
@@ -128,13 +138,13 @@ const PurchasingPreferencesForm = () => {
     const max = budgetMax.trim() ? Number(budgetMax) : null
 
     if (Number.isNaN(min) || Number.isNaN(max)) {
-      setError('Budget values must be numbers.')
+      setError(t('purchasingPreferences.errors.budgetNotNumber'))
       return
     }
 
     const validationError = validateBudgetRange(min, max)
     if (validationError) {
-      setError(validationError)
+      setError(t(`purchasingPreferences.errors.${validationError}`))
       return
     }
 
@@ -152,9 +162,9 @@ const PurchasingPreferencesForm = () => {
       setSuccess(null)
 
       await upsertBuyerPreferences(payload)
-      setSuccess('Preferences saved successfully.')
+      setSuccess(t('purchasingPreferences.success.saved'))
     } catch {
-      setError('Unable to save preferences. Please try again.')
+      setError(t('purchasingPreferences.errors.saveFailed'))
     } finally {
       setSaving(false)
     }
@@ -163,7 +173,7 @@ const PurchasingPreferencesForm = () => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface-alt">
-        <p className="text-secondary">Loading preferences...</p>
+        <p className="text-secondary">{t('purchasingPreferences.loading')}</p>
       </div>
     )
   }
@@ -172,16 +182,16 @@ const PurchasingPreferencesForm = () => {
     <div className="px-6 py-8">
       <div className="mx-auto max-w-4xl space-y-8">
         <header className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">Buyer Preferences</p>
-          <h1 className="mt-3 text-3xl font-bold text-primary">Purchasing preferences</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">{t('purchasingPreferences.badge')}</p>
+          <h1 className="mt-3 text-3xl font-bold text-primary">{t('purchasingPreferences.title')}</h1>
           <p className="mt-2 text-secondary">
-            Set your preferred wine types, appellations, and monthly budget to personalize pallet discovery.
+            {t('purchasingPreferences.subtitle')}
           </p>
         </header>
 
         <form onSubmit={handleSubmit} className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border space-y-8">
           <section>
-            <h2 className="text-lg font-semibold text-primary">Preferred wine types</h2>
+            <h2 className="text-lg font-semibold text-primary">{t('purchasingPreferences.sections.wineTypes')}</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {WINE_TYPES.map(type => (
                 <label key={type} className="flex items-center gap-3 rounded-2xl border border-border bg-surface-alt px-4 py-3">
@@ -191,21 +201,25 @@ const PurchasingPreferencesForm = () => {
                     onChange={() => toggleWineType(type)}
                     className="h-4 w-4 rounded border-border-strong"
                   />
-                  <span className="text-sm font-medium text-secondary">{type}</span>
+                  <span className="text-sm font-medium text-secondary">{t(`purchasingPreferences.wineTypes.${type.toLowerCase()}`)}</span>
                 </label>
               ))}
             </div>
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold text-primary">Preferred appellations</h2>
-            <p className="mt-1 text-sm text-secondary">Add up to 10 tags. Press Enter or comma to add.</p>
+            <h2 className="text-lg font-semibold text-primary">{t('purchasingPreferences.sections.appellations')}</h2>
+            <p className="mt-1 text-sm text-secondary">
+              {t('purchasingPreferences.appellations.helper', {
+                count: MAX_APPELLATIONS,
+              })}
+            </p>
             <input
               type="text"
               value={tagInput}
               onChange={event => setTagInput(event.target.value)}
               onKeyDown={handleTagInputKeyDown}
-              placeholder="e.g. Barolo, Brunello"
+              placeholder={t('purchasingPreferences.appellations.placeholder')}
               className="mt-3 block w-full rounded-xl border border-border px-4 py-2.5 text-primary bg-surface focus:outline-none focus:ring-2 focus:ring-focus"
             />
 
@@ -213,24 +227,27 @@ const PurchasingPreferencesForm = () => {
               {preferredAppellations.map(tag => (
                 <span key={tag} className="inline-flex items-center gap-2 rounded-full bg-accent-buyer-bg px-3 py-1 text-sm text-accent-buyer-text">
                   {tag}
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeTag(tag)}
                     className="rounded-full text-accent-buyer-text hover:opacity-70"
-                    aria-label={`Remove ${tag}`}
+                    customStyles
+                    aria-label={t('purchasingPreferences.appellations.removeTag', {
+                      tag,
+                    })}
                   >
                     x
-                  </button>
+                  </Button>
                 </span>
               ))}
             </div>
           </section>
 
-          <section>
-            <h2 className="text-lg font-semibold text-primary">Monthly budget range (EUR)</h2>
+          {/* <section>
+            <h2 className="text-lg font-semibold text-primary">{t('purchasingPreferences.budget.title')}</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <label htmlFor="budget-min" className="block text-sm font-medium text-secondary">Minimum</label>
+                <label htmlFor="budget-min" className="block text-sm font-medium text-secondary">{t('purchasingPreferences.budget.minimum')}</label>
                 <input
                   id="budget-min"
                   type="number"
@@ -242,7 +259,7 @@ const PurchasingPreferencesForm = () => {
                 />
               </div>
               <div>
-                <label htmlFor="budget-max" className="block text-sm font-medium text-secondary">Maximum</label>
+                <label htmlFor="budget-max" className="block text-sm font-medium text-secondary">{t('purchasingPreferences.budget.maximum')}</label>
                 <input
                   id="budget-max"
                   type="number"
@@ -254,7 +271,7 @@ const PurchasingPreferencesForm = () => {
                 />
               </div>
             </div>
-          </section>
+          </section> */}
 
           {budgetValidationError && (
             <p className="rounded-xl border border-error-border bg-error-bg px-4 py-3 text-sm text-error" role="alert">
@@ -275,13 +292,13 @@ const PurchasingPreferencesForm = () => {
           )}
 
           <div className="flex justify-end">
-            <button
+            <Button
               type="submit"
               disabled={saving || Boolean(budgetValidationError)}
-              className="rounded-full bg-accent-buyer px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+              // className="rounded-full bg-accent-buyer px-6 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
             >
-              {saving ? 'Saving...' : 'Save Preferences'}
-            </button>
+              {saving ? t('purchasingPreferences.actions.saving') : t('purchasingPreferences.actions.save')}
+            </Button>
           </div>
         </form>
       </div>

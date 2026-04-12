@@ -6,15 +6,19 @@ import enHome from '../../locales/en/home.json'
 import enPallets from '../../locales/en/pallets.json'
 import enBuyerDashboard from '../../locales/en/buyerDashboard.json'
 import enWineryDashboard from '../../locales/en/wineryDashboard.json'
+import enWineryInventory from '../../locales/en/wineryInventory.json'
+import enProfile from '../../locales/en/profile.json'
 import itCommon from '../../locales/it/common.json'
 import itHome from '../../locales/it/home.json'
 import itPallets from '../../locales/it/pallets.json'
 import itBuyerDashboard from '../../locales/it/buyerDashboard.json'
 import itWineryDashboard from '../../locales/it/wineryDashboard.json'
+import itWineryInventory from '../../locales/it/wineryInventory.json'
+import itProfile from '../../locales/it/profile.json'
 
 export const defaultNamespace = 'common'
 export const supportedLngs = ['en', 'it'] as const
-export const namespaces = ['common', 'home', 'pallets', 'buyerDashboard', 'wineryDashboard'] as const
+export const namespaces = ['common', 'home', 'pallets', 'buyerDashboard', 'wineryDashboard', 'wineryInventory', 'profile'] as const
 
 const resources = {
   en: {
@@ -23,6 +27,8 @@ const resources = {
     pallets: enPallets,
     buyerDashboard: enBuyerDashboard,
     wineryDashboard: enWineryDashboard,
+    wineryInventory: enWineryInventory,
+    profile: enProfile,
   },
   it: {
     common: itCommon,
@@ -30,6 +36,8 @@ const resources = {
     pallets: itPallets,
     buyerDashboard: itBuyerDashboard,
     wineryDashboard: itWineryDashboard,
+    wineryInventory: itWineryInventory,
+    profile: itProfile,
   },
 } as const
 

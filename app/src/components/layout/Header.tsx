@@ -33,6 +33,14 @@ const Header = () => {
           {/* Desktop actions */}
           <nav className="hidden items-center gap-2 md:flex">
             <ThemeToggle />
+            {role === 'winery' && (
+              <Link
+                to="/dashboard/winery/inventory"
+                className="rounded-full px-3 py-1.5 text-sm font-medium text-secondary hover:bg-surface-elevated transition-colors"
+              >
+                Inventory
+              </Link>
+            )}
             <Link
               to="/profile/edit"
               className="rounded-full px-3 py-1.5 text-sm font-medium text-secondary hover:bg-surface-elevated transition-colors"

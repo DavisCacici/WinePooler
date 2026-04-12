@@ -8,6 +8,14 @@ export interface WineInventory {
   total_stock: number
   allocated_bottles: number
   available_stock: number
+  updated_at?: string | null
+}
+
+export interface UpsertWineInventoryInput {
+  winery_id: string
+  wine_label: string
+  sku: string
+  total_stock: number
 }
 
 export const getInventoryByPallet = async (palletId: string): Promise<WineInventory | null> => {
@@ -44,4 +52,59 @@ export const getWineryInventory = async (wineryId: string): Promise<WineInventor
     ...inv,
     available_stock: inv.total_stock - inv.allocated_bottles,
   }))
+}
+
+export const createWineInventory = async (
+  input: UpsertWineInventoryInput
+): Promise<WineInventory> => {
+  const { data, error } = await supabase
+    .from('wine_inventory')
+    .insert({
+      winery_id: input.winery_id,
+      wine_label: input.wine_label,
+      sku: input.sku,
+      total_stock: input.total_stock,
+      allocated_bottles: 0,
+    })
+    .select('*')
+    .single()
+
+  if (error) throw error
+
+  return {
+    ...data,
+    available_stock: data.total_stock - data.allocated_bottles,
+  }
+}
+
+export const updateWineInventory = async (
+  inventoryId: string,
+  input: Pick<UpsertWineInventoryInput, 'wine_label' | 'sku' | 'total_stock'>
+): Promise<WineInventory> => {
+  const { data, error } = await supabase
+    .from('wine_inventory')
+    .update({
+      wine_label: input.wine_label,
+      sku: input.sku,
+      total_stock: input.total_stock,
+    })
+    .eq('id', inventoryId)
+    .select('*')
+    .single()
+
+  if (error) throw error
+
+  return {
+    ...data,
+    available_stock: data.total_stock - data.allocated_bottles,
+  }
+}
+
+export const deleteWineInventory = async (inventoryId: string): Promise<void> => {
+  const { error } = await supabase
+    .from('wine_inventory')
+    .delete()
+    .eq('id', inventoryId)
+
+  if (error) throw error
 }

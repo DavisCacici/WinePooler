@@ -44,6 +44,11 @@ const MobileNav = ({ open, onClose }: MobileNavProps) => {
 
   const navItems = [
     { label: 'Dashboard', to: dashboardPath },
+    ...(role === 'winery'
+      ? [
+          { label: 'Inventory', to: '/dashboard/winery/inventory' },
+        ]
+      : []),
     { label: 'Profile', to: '/profile/edit' },
     ...(role === 'buyer'
       ? [

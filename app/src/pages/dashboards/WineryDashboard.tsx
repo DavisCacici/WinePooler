@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { getWineryPickingList, type PickingListRow } from '../../lib/supabase/queries/virtualPallets'
 import { confirmPalletFulfillment, retryPalletPayout } from '../../lib/supabase/queries/payouts'
-import { supabase } from '../../lib/supabase/client'
 import SellingUnitConfig from '../winery/SellingUnitConfig'
 import ProductUnitSettings from '../winery/ProductUnitSettings'
+import { getWineryProfileByUserId } from '../../lib/supabase/queries/wineryProfiles'
+import { useNavigate } from 'react-router-dom'
 
 const formatEur = (cents: number) =>
   new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(cents / 100)
@@ -17,7 +18,8 @@ const WineryDashboard = () => {
   const [loadingPicking, setLoadingPicking] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
-  const [wineryProfileId, setWineryProfileId] = useState<string | null>(null)
+  const [wineryProfileId, setWineryProfileId] = useState<string | null>(null);
+  const navigate = useNavigate()
 
   const refreshPickingList = (profileId: string) => {
     getWineryPickingList(profileId)
@@ -31,31 +33,27 @@ const WineryDashboard = () => {
     let isMounted = true
     setLoadingPicking(true)
 
-    supabase
-      .from('winery_profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!isMounted || !data) {
+    getWineryProfileByUserId(user.id).catch(() => {
+      if (isMounted) navigate('/some-path') 
+    })
+    .then(profile => {
+      if (!isMounted || !profile) {
+        if (isMounted) setLoadingPicking(false)
+        return
+      }
+      if (isMounted) setWineryProfileId(profile.id)
+      getWineryPickingList(profile.id)
+        .then(rows => {
+          if (isMounted) setPickingLists(rows)
+        })
+        .catch(() => {
+          if (isMounted) setPickingLists([])
+        })
+        .finally(() => {
           if (isMounted) setLoadingPicking(false)
-          return
-        }
-        if (isMounted) setWineryProfileId(data.id)
-        getWineryPickingList(data.id)
-          .then(rows => {
-            if (isMounted) setPickingLists(rows)
-          })
-          .catch(() => {
-            if (isMounted) setPickingLists([])
-          })
-          .finally(() => {
-            if (isMounted) setLoadingPicking(false)
-          })
-      })
-      // .catch(() => {
-      //   if (isMounted) setLoadingPicking(false)
-      // })
+        })
+    });
+
 
     return () => {
       isMounted = false
