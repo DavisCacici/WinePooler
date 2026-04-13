@@ -43,5 +43,36 @@
       "appellationLimit": "Puoi aggiungere fino a {{count}} denominazioni.",
       "saveFailed": "Impossibile salvare le preferenze. Riprova."
     }
+  },
+  "wineryProfileForm": {
+    "loading": "Caricamento profilo...",
+    "title": {
+      "complete": "Completa il profilo aziendale",
+      "edit": "Modifica profilo aziendale"
+    },
+    "subtitle": {
+      "complete": "Inserisci i dati della tua azienda per iniziare a partecipare al pallet pooling.",
+      "edit": "Aggiorna qui sotto i dati della tua azienda."
+    },
+    "badge": {
+      "setup": "Configurazione profilo",
+      "settings": "Impostazioni profilo"
+    },
+    "fields": {
+      "companyName": "Ragione sociale",
+      "vatNumber": "Partita IVA",
+      "stripeConnectAccountId": "ID account Stripe Connect"
+    },
+    "actions": {
+      "cancel": "Annulla",
+      "saving": "Salvataggio...",
+      "saveAndContinue": "Salva e continua",
+      "saveChanges": "Salva modifiche"
+    },
+    "errors": {
+      "companyNameRequired": "La ragione sociale e obbligatoria",
+      "vatRequired": "La partita IVA e obbligatoria",
+      "saveFailed": "Impossibile salvare il profilo. Riprova."
+    }
   }
 }

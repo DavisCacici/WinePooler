@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import Button from '../../components/ui/Button'
 import { getWineryProfileByUserId, upsertWineryProfile } from '../../lib/supabase/queries/wineryProfiles'
 
@@ -21,16 +22,17 @@ interface FormErrors {
   stripe_connect_account_id?: string
 }
 
-const validateForm = (fields: FormFields): FormErrors => {
+const validateForm = (fields: FormFields, t: (key: string) => string): FormErrors => {
   const errors: FormErrors = {}
-  if (!fields.company_name.trim()) errors.company_name = 'Company name is required'
-  if (!fields.vat_number.trim()) errors.vat_number = 'VAT number is required'
+  if (!fields.company_name.trim()) errors.company_name = t('wineryProfileForm.errors.companyNameRequired')
+  if (!fields.vat_number.trim()) errors.vat_number = t('wineryProfileForm.errors.vatRequired')
   return errors
 }
 
 const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const { t } = useTranslation('profile')
 
   const [fields, setFields] = useState<FormFields>({
     company_name: '',
@@ -70,7 +72,7 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
     e.preventDefault()
     if (!user) return
 
-    const validationErrors = validateForm(fields)
+    const validationErrors = validateForm(fields, t)
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
       return
@@ -90,7 +92,7 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
       navigate('/dashboard/winery')
     } catch (err) {
       console.error('Error saving winery profile:', err)
-      setSubmitError(err instanceof Error ? err.message : 'Failed to save profile. Please try again.')
+      setSubmitError(err instanceof Error ? err.message : t('wineryProfileForm.errors.saveFailed'))
     } finally {
       setSubmitting(false)
     }
@@ -99,23 +101,23 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-surface-alt">
-        <p className="text-secondary">Loading profile…</p>
+        <p className="text-secondary">{t('wineryProfileForm.loading')}</p>
       </div>
     )
   }
 
-  const title = mode === 'complete' ? 'Complete Your Business Profile' : 'Edit Business Profile'
+  const title = mode === 'complete' ? t('wineryProfileForm.title.complete') : t('wineryProfileForm.title.edit')
   const subtitle =
     mode === 'complete'
-      ? 'Fill in your company details to start participating in pallet pooling.'
-      : 'Update your company details below.'
+      ? t('wineryProfileForm.subtitle.complete')
+      : t('wineryProfileForm.subtitle.edit')
 
   return (
     <div className="px-6 py-8">
       <div className="mx-auto max-w-2xl">
         <div className="rounded-3xl bg-surface p-8 shadow-sm ring-1 ring-border">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-accent-buyer">
-            {mode === 'complete' ? 'Profile Setup' : 'Profile Settings'}
+            {mode === 'complete' ? t('wineryProfileForm.badge.setup') : t('wineryProfileForm.badge.settings')}
           </p>
           <h1 className="mt-3 text-3xl font-bold text-primary">{title}</h1>
           <p className="mt-2 text-secondary">{subtitle}</p>
@@ -124,7 +126,7 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
             {/* Company Name */}
             <div>
               <label htmlFor="company_name" className="block text-sm font-medium text-secondary">
-                Company Name <span className="text-error">*</span>
+                {t('wineryProfileForm.fields.companyName')} <span className="text-error">*</span>
               </label>
               <input
                 id="company_name"
@@ -148,7 +150,7 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
             {/* VAT Number */}
             <div>
               <label htmlFor="vat_number" className="block text-sm font-medium text-secondary">
-                VAT Number <span className="text-error">*</span>
+                {t('wineryProfileForm.fields.vatNumber')} <span className="text-error">*</span>
               </label>
               <input
                 id="vat_number"
@@ -172,7 +174,7 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
             {/* Stripe Connect Account ID */}
             <div>
               <label htmlFor="stripe_connect_account_id" className="block text-sm font-medium text-secondary">
-                Stripe Connect Account ID 
+                {t('wineryProfileForm.fields.stripeConnectAccountId')}
               </label>
               <input
                 id="stripe_connect_account_id"
@@ -206,14 +208,18 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
                   onClick={() => navigate('/dashboard/buyer')}
                   variant='secondary'
                 >
-                  Cancel
+                  {t('wineryProfileForm.actions.cancel')}
                 </Button>
               )}
               <Button 
                 type="submit"
                 disabled={submitting}
               >
-                {submitting ? 'Saving…' : mode === 'complete' ? 'Save & Continue' : 'Save Changes'}
+                {submitting
+                  ? t('wineryProfileForm.actions.saving')
+                  : mode === 'complete'
+                    ? t('wineryProfileForm.actions.saveAndContinue')
+                    : t('wineryProfileForm.actions.saveChanges')}
               </Button>
             </div>
           </form>

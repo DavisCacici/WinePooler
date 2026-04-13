@@ -43,5 +43,36 @@
       "appellationLimit": "You can add up to {{count}} appellations.",
       "saveFailed": "Unable to save preferences. Please try again."
     }
+  },
+  "wineryProfileForm": {
+    "loading": "Loading profile...",
+    "title": {
+      "complete": "Complete Your Business Profile",
+      "edit": "Edit Business Profile"
+    },
+    "subtitle": {
+      "complete": "Fill in your company details to start participating in pallet pooling.",
+      "edit": "Update your company details below."
+    },
+    "badge": {
+      "setup": "Profile Setup",
+      "settings": "Profile Settings"
+    },
+    "fields": {
+      "companyName": "Company Name",
+      "vatNumber": "VAT Number",
+      "stripeConnectAccountId": "Stripe Connect Account ID"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "saveAndContinue": "Save & Continue",
+      "saveChanges": "Save Changes"
+    },
+    "errors": {
+      "companyNameRequired": "Company name is required",
+      "vatRequired": "VAT number is required",
+      "saveFailed": "Failed to save profile. Please try again."
+    }
   }
 }
