@@ -25,7 +25,6 @@ const validateForm = (fields: FormFields): FormErrors => {
   const errors: FormErrors = {}
   if (!fields.company_name.trim()) errors.company_name = 'Company name is required'
   if (!fields.vat_number.trim()) errors.vat_number = 'VAT number is required'
-  if (!fields.stripe_connect_account_id?.trim()) errors.stripe_connect_account_id = 'Street address is required'
   return errors
 }
 
@@ -87,13 +86,10 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
         stripe_connect_account_id: fields.stripe_connect_account_id?.trim(),
       })
 
-      if (mode === 'complete') {
-        navigate('/profile/area')
-      } else {
-        navigate('/dashboard/buyer')
-      }
+
+      navigate('/dashboard/winery')
     } catch (err) {
-      console.error('Error saving buyer profile:', err)
+      console.error('Error saving winery profile:', err)
       setSubmitError(err instanceof Error ? err.message : 'Failed to save profile. Please try again.')
     } finally {
       setSubmitting(false)
@@ -176,7 +172,7 @@ const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
             {/* Stripe Connect Account ID */}
             <div>
               <label htmlFor="stripe_connect_account_id" className="block text-sm font-medium text-secondary">
-                Stripe Connect Account ID <span className="text-error">*</span>
+                Stripe Connect Account ID 
               </label>
               <input
                 id="stripe_connect_account_id"
