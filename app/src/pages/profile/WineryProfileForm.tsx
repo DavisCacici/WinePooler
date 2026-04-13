@@ -1,52 +1,42 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../lib/supabase/AuthContext'
-import { upsertBuyerProfile, getBuyerProfile } from '../../lib/supabase/queries/buyerProfile'
 import { useEffect } from 'react'
 import Button from '../../components/ui/Button'
+import { getWineryProfileByUserId, upsertWineryProfile } from '../../lib/supabase/queries/wineryProfiles'
 
-interface BuyerProfileFormProps {
+interface WineryProfileFormProps {
   mode: 'complete' | 'edit'
 }
 
 interface FormFields {
   company_name: string
   vat_number: string
-  address_street: string
-  address_city: string
-  address_country: string
-  phone: string
+  stripe_connect_account_id?: string
 }
 
 interface FormErrors {
   company_name?: string
   vat_number?: string
-  address_street?: string
-  address_city?: string
-  address_country?: string
+  stripe_connect_account_id?: string
 }
 
 const validateForm = (fields: FormFields): FormErrors => {
   const errors: FormErrors = {}
   if (!fields.company_name.trim()) errors.company_name = 'Company name is required'
   if (!fields.vat_number.trim()) errors.vat_number = 'VAT number is required'
-  if (!fields.address_street.trim()) errors.address_street = 'Street address is required'
-  if (!fields.address_city.trim()) errors.address_city = 'City is required'
-  if (!fields.address_country.trim()) errors.address_country = 'Country is required'
+  if (!fields.stripe_connect_account_id?.trim()) errors.stripe_connect_account_id = 'Street address is required'
   return errors
 }
 
-const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
+const WineryProfileForm = ({ mode }: WineryProfileFormProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
   const [fields, setFields] = useState<FormFields>({
     company_name: '',
     vat_number: user?.user_metadata?.vat_number ?? '',
-    address_street: '',
-    address_city: '',
-    address_country: 'IT',
-    phone: '',
+    stripe_connect_account_id: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [submitting, setSubmitting] = useState(false)
@@ -55,16 +45,13 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
 
   useEffect(() => {
     if (mode === 'edit' && user) {
-      getBuyerProfile(user.id)
+      getWineryProfileByUserId(user.id)
         .then(profile => {
           if (profile) {
             setFields({
               company_name: profile.company_name,
               vat_number: profile.vat_number,
-              address_street: profile.address_street,
-              address_city: profile.address_city,
-              address_country: profile.address_country,
-              phone: profile.phone ?? '',
+              stripe_connect_account_id: profile.stripe_connect_account_id ?? '',
             })
           }
         })
@@ -93,14 +80,11 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
     setSubmitting(true)
     setSubmitError(null)
     try {
-      await upsertBuyerProfile({
+      await upsertWineryProfile({
         user_id: user.id,
         company_name: fields.company_name.trim(),
         vat_number: fields.vat_number.trim(),
-        address_street: fields.address_street.trim(),
-        address_city: fields.address_city.trim(),
-        address_country: fields.address_country.trim(),
-        phone: fields.phone.trim() || undefined,
+        stripe_connect_account_id: fields.stripe_connect_account_id?.trim(),
       })
 
       if (mode === 'complete') {
@@ -189,91 +173,28 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
               )}
             </div>
 
-            {/* Address Street */}
+            {/* Stripe Connect Account ID */}
             <div>
-              <label htmlFor="address_street" className="block text-sm font-medium text-secondary">
-                Street Address <span className="text-error">*</span>
+              <label htmlFor="stripe_connect_account_id" className="block text-sm font-medium text-secondary">
+                Stripe Connect Account ID <span className="text-error">*</span>
               </label>
               <input
-                id="address_street"
-                name="address_street"
+                id="stripe_connect_account_id"
+                name="stripe_connect_account_id"
                 type="text"
-                value={fields.address_street}
+                value={fields.stripe_connect_account_id}
                 onChange={handleChange}
-                aria-describedby={errors.address_street ? 'address_street-error' : undefined}
-                aria-invalid={!!errors.address_street}
+                aria-describedby={errors.stripe_connect_account_id ? 'stripe_connect_account_id-error' : undefined}
+                aria-invalid={!!errors.stripe_connect_account_id}
                 className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
-                  errors.address_street ? 'border-error bg-error-bg' : 'border-border bg-surface'
+                  errors.stripe_connect_account_id ? 'border-error bg-error-bg' : 'border-border bg-surface'
                 }`}
               />
-              {errors.address_street && (
-                <p id="address_street-error" role="alert" className="mt-1 text-sm text-error">
-                  {errors.address_street}
+              {errors.stripe_connect_account_id && (
+                <p id="stripe_connect_account_id-error" role="alert" className="mt-1 text-sm text-error">
+                  {errors.stripe_connect_account_id}
                 </p>
               )}
-            </div>
-
-            {/* Address City */}
-            <div>
-              <label htmlFor="address_city" className="block text-sm font-medium text-secondary">
-                City <span className="text-error">*</span>
-              </label>
-              <input
-                id="address_city"
-                name="address_city"
-                type="text"
-                value={fields.address_city}
-                onChange={handleChange}
-                aria-describedby={errors.address_city ? 'address_city-error' : undefined}
-                aria-invalid={!!errors.address_city}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
-                  errors.address_city ? 'border-error bg-error-bg' : 'border-border bg-surface'
-                }`}
-              />
-              {errors.address_city && (
-                <p id="address_city-error" role="alert" className="mt-1 text-sm text-error">
-                  {errors.address_city}
-                </p>
-              )}
-            </div>
-
-            {/* Country */}
-            <div>
-              <label htmlFor="address_country" className="block text-sm font-medium text-secondary">
-                Country <span className="text-error">*</span>
-              </label>
-              <input
-                id="address_country"
-                name="address_country"
-                type="text"
-                value={fields.address_country}
-                onChange={handleChange}
-                aria-describedby={errors.address_country ? 'address_country-error' : undefined}
-                aria-invalid={!!errors.address_country}
-                className={`mt-1 block w-full rounded-xl border px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus ${
-                  errors.address_country ? 'border-error bg-error-bg' : 'border-border bg-surface'
-                }`}
-              />
-              {errors.address_country && (
-                <p id="address_country-error" role="alert" className="mt-1 text-sm text-error">
-                  {errors.address_country}
-                </p>
-              )}
-            </div>
-
-            {/* Phone (optional) */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-secondary">
-                Phone
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={fields.phone}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-focus"
-              />
             </div>
 
             {submitError && (
@@ -306,4 +227,5 @@ const BuyerProfileForm = ({ mode }: BuyerProfileFormProps) => {
   )
 }
 
-export default BuyerProfileForm
+export default WineryProfileForm
+

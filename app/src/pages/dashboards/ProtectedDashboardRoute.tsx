@@ -4,7 +4,7 @@ import { useAuth } from '../../lib/supabase/AuthContext'
 import type { AppRole } from '../../lib/supabase/auth'
 
 type ProtectedDashboardRouteProps = {
-  allowedRole: AppRole
+  allowedRole?: AppRole | AppRole[]
   children: ReactNode
 }
 
@@ -19,7 +19,15 @@ const ProtectedDashboardRoute = ({ allowedRole, children }: ProtectedDashboardRo
     return <Navigate to="/login" replace />
   }
 
-  if (role !== allowedRole) {
+  if (allowedRole) {
+    const roles = Array.isArray(allowedRole) ? allowedRole : [allowedRole]
+
+    if (!role || !roles.includes(role)) {
+      return <Navigate to="/dashboard" replace />
+    }
+  }
+
+  if (!role) {
     return <Navigate to="/dashboard" replace />
   }
 

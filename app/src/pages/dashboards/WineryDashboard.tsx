@@ -34,24 +34,27 @@ const WineryDashboard = () => {
     setLoadingPicking(true)
 
     getWineryProfileByUserId(user.id).catch(() => {
-      if (isMounted) navigate('/some-path') 
+      if (isMounted) navigate('/profile/complete') 
     })
     .then(profile => {
       if (!isMounted || !profile) {
-        if (isMounted) setLoadingPicking(false)
+        navigate('/profile/complete') 
         return
       }
-      if (isMounted) setWineryProfileId(profile.id)
-      getWineryPickingList(profile.id)
-        .then(rows => {
-          if (isMounted) setPickingLists(rows)
-        })
-        .catch(() => {
-          if (isMounted) setPickingLists([])
-        })
-        .finally(() => {
-          if (isMounted) setLoadingPicking(false)
-        })
+      else{
+        if (isMounted) setWineryProfileId(profile?.id as string)
+        getWineryPickingList(profile?.id as string)
+          .then(rows => {
+            if (isMounted) setPickingLists(rows)
+          })
+          .catch(() => {
+            if (isMounted) setPickingLists([])
+          })
+          .finally(() => {
+            if (isMounted) setLoadingPicking(false)
+          })
+
+      }
     });
 
 

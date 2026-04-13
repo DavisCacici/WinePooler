@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { useAuth } from './lib/supabase/AuthContext'
 import Home from './pages/Home'
 import Register from './pages/Register'
 import Login from './pages/Login'
@@ -13,6 +14,19 @@ import WineInventoryPage from './pages/winery/WineInventoryPage'
 import { AuthProvider } from './lib/supabase/AuthContext'
 import { ThemeProvider } from './lib/theme/ThemeContext'
 import LayoutShell from './components/layout/LayoutShell'
+import WineryProfileForm from './pages/profile/WineryProfileForm'
+
+type ProfileMode = 'complete' | 'edit'
+
+const ProfileFormByRole = ({ mode }: { mode: ProfileMode }) => {
+  const { role } = useAuth()
+
+  if (role === 'buyer') {
+    return <BuyerProfileForm mode={mode} />
+  }
+
+  return <WineryProfileForm mode={mode} />
+}
 
 const App = () => {
   return (
@@ -61,9 +75,9 @@ const App = () => {
           <Route
             path="/profile/complete"
             element={
-              <ProtectedDashboardRoute allowedRole="buyer">
+              <ProtectedDashboardRoute allowedRole={['buyer', 'winery']}>
                 <LayoutShell>
-                  <BuyerProfileForm mode="complete" />
+                  <ProfileFormByRole mode="complete" />
                 </LayoutShell>
               </ProtectedDashboardRoute>
             }
@@ -71,9 +85,9 @@ const App = () => {
           <Route
             path="/profile/edit"
             element={
-              <ProtectedDashboardRoute allowedRole="buyer">
+              <ProtectedDashboardRoute allowedRole={['buyer', 'winery']}>
                 <LayoutShell>
-                  <BuyerProfileForm mode="edit" />
+                  <ProfileFormByRole mode="edit" />
                 </LayoutShell>
               </ProtectedDashboardRoute>
             }
