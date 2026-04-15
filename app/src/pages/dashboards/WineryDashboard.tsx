@@ -37,9 +37,11 @@ const WineryDashboard = () => {
       if (isMounted) navigate('/profile/complete') 
     })
     .then(profile => {
-      if (!isMounted || !profile) {
+      if (!isMounted) return;
+
+      if (!profile) {
         navigate('/profile/complete') 
-        return
+        return;
       }
       else{
         if (isMounted) setWineryProfileId(profile?.id as string)
