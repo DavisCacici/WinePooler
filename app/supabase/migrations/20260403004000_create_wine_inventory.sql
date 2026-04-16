@@ -9,8 +9,10 @@ CREATE TABLE public.wine_inventory (
   winery_id         uuid NOT NULL REFERENCES public.winery_profiles(id) ON DELETE CASCADE,
   wine_label        text NOT NULL,
   sku               text NOT NULL,
-  total_stock       integer NOT NULL DEFAULT 0 CHECK (total_stock >= 0),
   allocated_bottles integer NOT NULL DEFAULT 0 CHECK (allocated_bottles >= 0),
+  price             numeric,
+  allocated_case    integer NOT NULL DEFAULT 0 CHECK (allocated_case >= 0),
+  available         boolean NOT NULL DEFAULT true,
   updated_at        timestamptz DEFAULT now(),
   UNIQUE (winery_id, sku)
 );
@@ -42,11 +44,11 @@ ALTER TABLE public.virtual_pallets
 -- ────────────────────────────────────────────────────────────
 -- 3. Seed inventory rows (one per mock winery from Story 3.1)
 -- ────────────────────────────────────────────────────────────
-INSERT INTO public.wine_inventory (winery_id, wine_label, sku, total_stock, allocated_bottles)
+INSERT INTO public.wine_inventory (winery_id, wine_label, sku, allocated_bottles, price, allocated_case, available)
 VALUES
-  ((SELECT id FROM public.winery_profiles WHERE company_name = 'Cantina Aurora'),  'Rosso Riserva',     'CAU-RR-001', 800, 432),
-  ((SELECT id FROM public.winery_profiles WHERE company_name = 'Tenuta Collina'),  'Bianco Superiore',  'TCO-BS-001', 700, 324),
-  ((SELECT id FROM public.winery_profiles WHERE company_name = 'Vigna Nuova'),     'Barolo DOCG',       'VNU-BA-001', 900, 486);
+  ((SELECT id FROM public.winery_profiles WHERE company_name = 'Cantina Aurora'),  'Rosso Riserva',     'CAU-RR-001', 432, NULL, 800, true),
+  ((SELECT id FROM public.winery_profiles WHERE company_name = 'Tenuta Collina'),  'Bianco Superiore',  'TCO-BS-001', 324, NULL, 700, true),
+  ((SELECT id FROM public.winery_profiles WHERE company_name = 'Vigna Nuova'),     'Barolo DOCG',       'VNU-BA-001', 486, NULL, 900, true);
 
 -- Link existing open pallets to their winery's inventory
 UPDATE public.virtual_pallets vp

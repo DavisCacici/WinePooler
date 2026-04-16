@@ -24,6 +24,20 @@
     "subtitle": "Toggle between macro-area map view and pallet grid view.",
     "newPallet": "+ New Pallet"
   },
+  "inventory": {
+    "title": "Winery inventory",
+    "subtitle": "Complete overview of winery stock availability.",
+    "loading": "Loading inventory...",
+    "empty": "No inventory available.",
+    "columns": {
+      "winery": "Winery",
+      "wine": "Wine",
+      "sku": "SKU",
+      "total": "Total",
+      "allocated": "Allocated",
+      "available": "Available"
+    }
+  },
   "loadingPallets": "Loading pallets...",
   "card": {
     "unknownWinery": "Unknown winery",

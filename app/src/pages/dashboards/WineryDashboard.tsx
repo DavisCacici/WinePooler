@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { getWineryPickingList, type PickingListRow } from '../../lib/supabase/queries/virtualPallets'
 import { confirmPalletFulfillment, retryPalletPayout } from '../../lib/supabase/queries/payouts'
-import SellingUnitConfig from '../winery/SellingUnitConfig'
-import ProductUnitSettings from '../winery/ProductUnitSettings'
 import { getWineryProfileByUserId } from '../../lib/supabase/queries/wineryProfiles'
 import { useNavigate } from 'react-router-dom'
 
@@ -141,16 +139,7 @@ const WineryDashboard = () => {
           ))}
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
-          <article className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
-            <h2 className="text-xl font-semibold text-primary">{t('analytics.title')}</h2>
-            <ul className="mt-4 space-y-4 text-sm text-secondary">
-              <li>{t('analytics.highlights.strongDemand')}</li>
-              <li>{t('analytics.highlights.fillVelocity')}</li>
-              <li>{t('analytics.highlights.underAllocated')}</li>
-            </ul>
-          </article>
-
+        <section >
           <article className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
             <div className="flex items-center justify-between">
               <div>
@@ -249,13 +238,6 @@ const WineryDashboard = () => {
           </article>
         </section>
 
-        {wineryProfileId && (
-          <SellingUnitConfig wineryProfileId={wineryProfileId} />
-        )}
-
-        {wineryProfileId && (
-          <ProductUnitSettings wineryProfileId={wineryProfileId} />
-        )}
       </div>
     </div>
   )

@@ -11,19 +11,56 @@
     "products": "Prodotti",
     "totalAvailableBottles": "Bottiglie disponibili totali"
   },
+  "cards": {
+    "title": "I tuoi prodotti",
+    "items": "{{count}} articoli",
+    "empty": "Nessun prodotto ancora. Crea il tuo primo prodotto vino.",
+    "addProduct": "+ Nuovo prodotto",
+    "openDetail": "Apri dettaglio",
+    "noImage": "Nessuna foto",
+    "total": "Totale",
+    "allocated": "Allocate",
+    "available": "Disponibili",
+    "pageStatus": "Pagina {{page}} di {{totalPages}}",
+    "prevPage": "Precedente",
+    "nextPage": "Successiva"
+  },
   "form": {
     "addTitle": "Aggiungi prodotto vino",
     "editTitle": "Modifica prodotto vino",
     "wineLabel": "Etichetta vino",
     "wineLabelPlaceholder": "es. Rosso Riserva",
+    "description": "Descrizione",
+    "descriptionPlaceholder": "Descrivi il vino, note di degustazione, uvaggio o annata",
     "sku": "SKU",
     "skuPlaceholder": "es. CAU-RR-001",
     "totalStock": "Stock totale (bottiglie)",
+    "allocated_case": "Casse allocate",
+    "allocated_bottles": "Bottiglie allocate",
     "totalStockPlaceholder": "0",
     "save": "Salvataggio...",
     "addButton": "Aggiungi prodotto",
     "updateButton": "Aggiorna prodotto",
     "cancelEdit": "Annulla modifica"
+  },
+  "product": {
+    "loadingTitle": "Caricamento prodotto",
+    "createTitle": "Crea prodotto vino",
+    "detailTitle": "Dettaglio prodotto",
+    "subtitle": "Gestisci i dati del prodotto e aggiorna la scheda in qualsiasi momento.",
+    "backToCatalog": "Torna al catalogo",
+    "createButton": "Crea prodotto",
+    "saveButton": "Salva modifiche",
+    "price": "Prezzo",
+    "pricePlaceholder": "es. 11.50",
+    "availableLabel": "Prodotto disponibile",
+    "photo": "Foto prodotto",
+    "photoHint": "La foto verra caricata nello storage Supabase (bucket wine-inventory).",
+    "preview": "Anteprima foto",
+    "notFound": "Prodotto non trovato o non accessibile.",
+    "validation": {
+      "priceInvalid": "Il prezzo deve essere un numero >= 0."
+    }
   },
   "table": {
     "title": "I tuoi prodotti",

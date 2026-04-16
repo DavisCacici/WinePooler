@@ -24,6 +24,20 @@
     "subtitle": "Passa dalla vista mappa per macro-area alla vista griglia pallet.",
     "newPallet": "+ Nuovo pallet"
   },
+  "inventory": {
+    "title": "Winery inventory",
+    "subtitle": "Panoramica completa delle disponibilita delle cantine.",
+    "loading": "Caricamento inventory...",
+    "empty": "Nessuna inventory disponibile.",
+    "columns": {
+      "winery": "Cantina",
+      "wine": "Vino",
+      "sku": "SKU",
+      "total": "Totale",
+      "allocated": "Allocato",
+      "available": "Disponibile"
+    }
+  },
   "loadingPallets": "Caricamento pallet...",
   "card": {
     "unknownWinery": "Cantina sconosciuta",

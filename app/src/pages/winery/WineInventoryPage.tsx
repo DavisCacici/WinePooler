@@ -1,26 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { supabase } from '../../lib/supabase/client'
 import {
-  createWineInventory,
-  deleteWineInventory,
   getWineryInventory,
-  updateWineInventory,
   type WineInventory,
 } from '../../lib/supabase/queries/wineInventory'
 
-interface InventoryFormState {
-  wineLabel: string
-  sku: string
-  totalStock: string
-}
-
-const EMPTY_FORM: InventoryFormState = {
-  wineLabel: '',
-  sku: '',
-  totalStock: '',
-}
+const PAGE_SIZE = 9
 
 const parseErrorMessage = (err: unknown, fallback: string, duplicateSkuMessage: string) => {
   if (!err || typeof err !== 'object') return fallback
@@ -38,10 +26,7 @@ const WineInventoryPage = () => {
   const [wineryProfileId, setWineryProfileId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [rows, setRows] = useState<WineInventory[]>([])
-  const [form, setForm] = useState<InventoryFormState>(EMPTY_FORM)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [saving, setSaving] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   useEffect(() => {
@@ -93,93 +78,23 @@ const WineInventoryPage = () => {
     [rows]
   )
 
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / PAGE_SIZE))
+  const clampedPage = Math.min(currentPage, totalPages)
+  const pageRows = useMemo(() => {
+    const start = (clampedPage - 1) * PAGE_SIZE
+    return sortedRows.slice(start, start + PAGE_SIZE)
+  }, [sortedRows, clampedPage])
+
   const totalAvailable = useMemo(
     () => rows.reduce((sum, row) => sum + row.available_stock, 0),
     [rows]
   )
 
-  const validationErrors: string[] = []
-  if (!form.wineLabel.trim()) validationErrors.push(t('validation.wineLabelRequired'))
-  if (!form.sku.trim()) validationErrors.push(t('validation.skuRequired'))
-  const parsedStock = Number(form.totalStock)
-  if (!Number.isInteger(parsedStock) || parsedStock < 0) {
-    validationErrors.push(t('validation.totalStockInvalid'))
-  }
-
-  const isValid = validationErrors.length === 0
-
-  const resetForm = () => {
-    setForm(EMPTY_FORM)
-    setEditingId(null)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!isValid || !wineryProfileId) return
-
-    setSaving(true)
-    setFeedback(null)
-
-    try {
-      if (editingId) {
-        const updated = await updateWineInventory(editingId, {
-          wine_label: form.wineLabel.trim(),
-          sku: form.sku.trim(),
-          total_stock: parsedStock,
-        })
-        setRows(prev => prev.map(row => (row.id === updated.id ? updated : row)))
-        setFeedback({ type: 'success', message: t('feedback.updated') })
-      } else {
-        const created = await createWineInventory({
-          winery_id: wineryProfileId,
-          wine_label: form.wineLabel.trim(),
-          sku: form.sku.trim(),
-          total_stock: parsedStock,
-        })
-        setRows(prev => [...prev, created])
-        setFeedback({ type: 'success', message: t('feedback.added') })
-      }
-      resetForm()
-    } catch (err) {
-      setFeedback({
-        type: 'error',
-        message: parseErrorMessage(err, t('errors.saveFailed'), t('errors.duplicateSku')),
-      })
-    } finally {
-      setSaving(false)
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages)
     }
-  }
-
-  const handleEdit = (row: WineInventory) => {
-    setEditingId(row.id)
-    setForm({
-      wineLabel: row.wine_label,
-      sku: row.sku,
-      totalStock: String(row.total_stock),
-    })
-    setFeedback(null)
-  }
-
-  const handleDelete = async (row: WineInventory) => {
-    const confirmed = window.confirm(t('confirmDelete', { wineLabel: row.wine_label }))
-    if (!confirmed) return
-
-    setDeletingId(row.id)
-    setFeedback(null)
-    try {
-      await deleteWineInventory(row.id)
-      setRows(prev => prev.filter(item => item.id !== row.id))
-      if (editingId === row.id) resetForm()
-      setFeedback({ type: 'success', message: t('feedback.deleted') })
-    } catch (err) {
-      setFeedback({
-        type: 'error',
-        message: parseErrorMessage(err, t('errors.deleteFailed'), t('errors.duplicateSku')),
-      })
-    } finally {
-      setDeletingId(null)
-    }
-  }
+  }, [currentPage, totalPages])
 
   if (loading) {
     return (
@@ -222,156 +137,104 @@ const WineInventoryPage = () => {
               <p className="mt-1 text-2xl font-semibold text-primary">{totalAvailable}</p>
             </article>
           </div>
+          <div className="mt-6">
+            <Link
+              to="/dashboard/winery/inventory/new"
+              className="inline-flex rounded-full border border-accent-winery bg-accent-winery px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              {t('cards.addProduct')}
+            </Link>
+          </div>
         </header>
 
         <section className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
-          <h2 className="text-lg font-semibold text-primary">
-            {editingId ? t('form.editTitle') : t('form.addTitle')}
-          </h2>
-          <form className="mt-5 grid gap-4 md:grid-cols-4" onSubmit={handleSubmit}>
-            <div className="md:col-span-2">
-              <label htmlFor="wine-label" className="block text-sm font-medium text-secondary">
-                {t('form.wineLabel')}
-              </label>
-              <input
-                id="wine-label"
-                type="text"
-                value={form.wineLabel}
-                onChange={(e) => setForm(prev => ({ ...prev, wineLabel: e.target.value }))}
-                placeholder={t('form.wineLabelPlaceholder')}
-                className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-primary">{t('cards.title')}</h2>
+            <p className="text-sm text-secondary">{t('cards.items', { count: rows.length })}</p>
+          </div>
 
-            <div>
-              <label htmlFor="sku" className="block text-sm font-medium text-secondary">
-                {t('form.sku')}
-              </label>
-              <input
-                id="sku"
-                type="text"
-                value={form.sku}
-                onChange={(e) => setForm(prev => ({ ...prev, sku: e.target.value.toUpperCase() }))}
-                placeholder={t('form.skuPlaceholder')}
-                className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
+          {feedback && (
+            <p className={`mt-4 text-sm ${feedback.type === 'success' ? 'text-success-text' : 'text-error'}`} role="status">
+              {feedback.message}
+            </p>
+          )}
 
-            <div>
-              <label htmlFor="total-stock" className="block text-sm font-medium text-secondary">
-                {t('form.totalStock')}
-              </label>
-              <input
-                id="total-stock"
-                type="number"
-                min={0}
-                step={1}
-                value={form.totalStock}
-                onChange={(e) => setForm(prev => ({ ...prev, totalStock: e.target.value }))}
-                placeholder={t('form.totalStockPlaceholder')}
-                className="mt-1 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-              />
-            </div>
+          {sortedRows.length === 0 && (
+            <p className="mt-5 rounded-2xl border border-border bg-surface-alt p-6 text-center text-muted">
+              {t('cards.empty')}
+            </p>
+          )}
 
-            {validationErrors.length > 0 && (
-              <div className="md:col-span-4 rounded-lg bg-error-bg p-3">
-                {validationErrors.map(err => (
-                  <p key={err} className="text-sm text-error">{err}</p>
+          {sortedRows.length > 0 && (
+            <>
+              <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {pageRows.map(row => (
+                  <article key={row.id} className="overflow-hidden rounded-2xl border border-border bg-surface-alt">
+                    {row.image_url ? (
+                      <img src={row.image_url} alt={row.wine_label} className="h-40 w-full object-cover" />
+                    ) : (
+                      <div className="flex h-40 items-center justify-center bg-surface-elevated text-sm text-muted">
+                        {t('cards.noImage')}
+                      </div>
+                    )}
+                    <div className="space-y-3 p-4">
+                      <div>
+                        <p className="text-base font-semibold text-primary">{row.wine_label}</p>
+                        <p className="text-xs uppercase tracking-wide text-secondary">{row.sku}</p>
+                        {row.description && (
+                          <p className="mt-2 line-clamp-2 text-sm text-secondary">{row.description}</p>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="rounded-xl bg-surface px-2 py-2">
+                          <p className="text-[10px] uppercase tracking-wide text-muted">{t('cards.total')}</p>
+                          <p className="text-sm font-semibold text-primary">{row.total_stock}</p>
+                        </div>
+                        <div className="rounded-xl bg-surface px-2 py-2">
+                          <p className="text-[10px] uppercase tracking-wide text-muted">{t('cards.allocated')}</p>
+                          <p className="text-sm font-semibold text-primary">{row.allocated_bottles}</p>
+                        </div>
+                        <div className="rounded-xl bg-surface px-2 py-2">
+                          <p className="text-[10px] uppercase tracking-wide text-muted">{t('cards.available')}</p>
+                          <p className="text-sm font-semibold text-success-text">{row.available_stock}</p>
+                        </div>
+                      </div>
+                      <Link
+                        to={`/dashboard/winery/inventory/${row.id}`}
+                        className="inline-flex w-full items-center justify-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-secondary hover:bg-surface-elevated"
+                      >
+                        {t('cards.openDetail')}
+                      </Link>
+                    </div>
+                  </article>
                 ))}
               </div>
-            )}
 
-            {feedback && (
-              <p
-                className={`md:col-span-4 text-sm ${feedback.type === 'success' ? 'text-success-text' : 'text-error'}`}
-                role="status"
-              >
-                {feedback.message}
-              </p>
-            )}
-
-            <div className="md:col-span-4 flex gap-3">
-              <button
-                type="submit"
-                disabled={!isValid || saving}
-                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
-              >
-                {saving ? t('form.save') : editingId ? t('form.updateButton') : t('form.addButton')}
-              </button>
-              {editingId && (
-                <button
-                  type="button"
-                  onClick={resetForm}
-                  className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-secondary hover:bg-surface-alt"
-                >
-                  {t('form.cancelEdit')}
-                </button>
-              )}
-            </div>
-          </form>
-        </section>
-
-        <section className="rounded-3xl bg-surface p-6 shadow-sm ring-1 ring-border">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-primary">{t('table.title')}</h2>
-            <p className="text-sm text-secondary">{t('table.items', { count: rows.length })}</p>
-          </div>
-
-          <div className="mt-5 overflow-hidden rounded-2xl border border-border">
-            <table className="min-w-full divide-y divide-border text-sm">
-              <thead className="bg-surface-alt text-left text-secondary">
-                <tr>
-                  <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">{t('table.wineLabel')}</th>
-                  <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">{t('table.sku')}</th>
-                  <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">{t('table.totalStock')}</th>
-                  <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">{t('table.allocated')}</th>
-                  <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">{t('table.available')}</th>
-                  <th className="px-4 py-3 font-medium text-xs uppercase tracking-wider">{t('table.actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border bg-surface text-primary">
-                {sortedRows.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-4 text-center text-muted">
-                      {t('table.empty')}
-                    </td>
-                  </tr>
-                )}
-                {sortedRows.map(row => (
-                  <tr key={row.id}>
-                    <td className="px-4 py-3 font-medium">{row.wine_label}</td>
-                    <td className="px-4 py-3 text-muted">{row.sku}</td>
-                    <td className="px-4 py-3">{row.total_stock}</td>
-                    <td className="px-4 py-3">{row.allocated_bottles}</td>
-                    <td className="px-4 py-3">
-                      <span className="rounded-full bg-success-bg px-2 py-0.5 text-xs font-medium text-success-text">
-                        {row.available_stock}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleEdit(row)}
-                          className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-secondary hover:bg-surface-alt"
-                        >
-                          {t('table.edit')}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(row)}
-                          disabled={deletingId === row.id}
-                          className="rounded-full border border-error-border bg-surface px-3 py-1 text-xs font-medium text-error hover:bg-error-bg disabled:opacity-50"
-                        >
-                          {deletingId === row.id ? t('table.deleting') : t('table.delete')}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              <div className="mt-6 flex items-center justify-between">
+                <p className="text-sm text-secondary">
+                  {t('cards.pageStatus', { page: clampedPage, totalPages })}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={clampedPage <= 1}
+                    onClick={() => setCurrentPage(value => Math.max(1, value - 1))}
+                    className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {t('cards.prevPage')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={clampedPage >= totalPages}
+                    onClick={() => setCurrentPage(value => Math.min(totalPages, value + 1))}
+                    className="rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {t('cards.nextPage')}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </section>
       </div>
     </div>

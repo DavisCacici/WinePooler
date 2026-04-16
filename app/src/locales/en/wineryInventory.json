@@ -11,11 +11,27 @@
     "products": "Products",
     "totalAvailableBottles": "Total Available Bottles"
   },
+  "cards": {
+    "title": "Your Products",
+    "items": "{{count}} items",
+    "empty": "No products yet. Create your first wine product.",
+    "addProduct": "+ New Product",
+    "openDetail": "Open detail",
+    "noImage": "No image",
+    "total": "Total",
+    "allocated": "Allocated",
+    "available": "Available",
+    "pageStatus": "Page {{page}} of {{totalPages}}",
+    "prevPage": "Previous",
+    "nextPage": "Next"
+  },
   "form": {
     "addTitle": "Add Wine Product",
     "editTitle": "Edit Wine Product",
     "wineLabel": "Wine Label",
     "wineLabelPlaceholder": "e.g. Rosso Riserva",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe wine notes, blend, vintage, or pairings",
     "sku": "SKU",
     "skuPlaceholder": "e.g. CAU-RR-001",
     "totalStock": "Total Stock (bottles)",
@@ -24,6 +40,25 @@
     "addButton": "Add Product",
     "updateButton": "Update Product",
     "cancelEdit": "Cancel Edit"
+  },
+  "product": {
+    "loadingTitle": "Loading product",
+    "createTitle": "Create Wine Product",
+    "detailTitle": "Product Detail",
+    "subtitle": "Manage product information and update this record any time.",
+    "backToCatalog": "Back to catalog",
+    "createButton": "Create Product",
+    "saveButton": "Save Changes",
+    "price": "Price (optional)",
+    "pricePlaceholder": "e.g. 11.50",
+    "availableLabel": "Product available",
+    "photo": "Product photo",
+    "photoHint": "The photo will be uploaded to Supabase storage (wine-inventory bucket).",
+    "preview": "Photo preview",
+    "notFound": "Product not found or not accessible.",
+    "validation": {
+      "priceInvalid": "Price must be a number >= 0."
+    }
   },
   "table": {
     "title": "Your Products",
