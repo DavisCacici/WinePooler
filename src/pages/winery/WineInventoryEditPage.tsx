@@ -47,7 +47,7 @@ const parseErrorMessage = (err: unknown, fallback: string, duplicateSkuMessage: 
   return maybeMessage
 }
 
-const WineInventoryProductPage = () => {
+const WineInventoryEditPage = () => {
   const { t } = useTranslation('wineryInventory')
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -455,4 +455,4 @@ const WineInventoryProductPage = () => {
   )
 }
 
-export default WineInventoryProductPage
+export default WineInventoryEditPage

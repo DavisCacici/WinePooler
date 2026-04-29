@@ -7,13 +7,14 @@ import { getBuyerPreferences, type BuyerPreferences } from '../../lib/supabase/q
 import { getPalletsByArea, buyerHasOrderOnPallet } from '../../lib/supabase/queries/virtualPallets'
 import { palletProgressLabel, palletProgressUnitLabel } from '../../lib/palletProgress'
 import { getSellingUnitsByWinery, computeUnitPrices, type UnitPrice } from '../../lib/supabase/queries/sellingUnits'
-import { getAllWineryInventory, type WineryInventoryRow } from '../../lib/supabase/queries/wineInventory'
 import CreatePalletModal from '../pallets/CreatePalletModal'
 import AddOrderModal from '../pallets/AddOrderModal'
 import FreezeNotification from '../../components/notifications/FreezeNotification'
 import PalletPricingBadge from '../../components/pallets/PalletPricingBadge'
 import InventoryStatusBadge from '../../components/pallets/InventoryStatusBadge'
 import { supabase } from '../../lib/supabase/client'
+import { getAllWineryInventory, type WineryInventoryRow } from '../../lib/supabase/queries/wineInventory'
+import Article from '../../components/ui/Article'
 
 interface BuyerPalletCard {
   id: string
@@ -163,7 +164,7 @@ const BuyerDashboard = () => {
     setLoadingWineryInventory(true)
 
     getAllWineryInventory()
-      .then(rows => {
+      .then((rows: WineryInventoryRow[]) => {
         if (isMounted) {
           setWineryInventory(rows)
         }
@@ -544,34 +545,22 @@ const BuyerDashboard = () => {
             <p className="mt-4 text-sm text-secondary">{t('inventory.empty')}</p>
           )}
 
-          {!loadingWineryInventory && wineryInventory.length > 0 && (
-            <div className="mt-6 overflow-x-auto">
-              <table className="min-w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-secondary">
-                    <th className="px-3 py-2 font-semibold">{t('inventory.columns.winery')}</th>
-                    <th className="px-3 py-2 font-semibold">{t('inventory.columns.wine')}</th>
-                    <th className="px-3 py-2 font-semibold">{t('inventory.columns.sku')}</th>
-                    <th className="px-3 py-2 text-right font-semibold">{t('inventory.columns.total')}</th>
-                    <th className="px-3 py-2 text-right font-semibold">{t('inventory.columns.allocated')}</th>
-                    <th className="px-3 py-2 text-right font-semibold">{t('inventory.columns.available')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {wineryInventory.map(row => (
-                    <tr key={row.id} className="border-b border-border/70 text-sm text-primary">
-                      <td className="px-3 py-2">{row.winery_name}</td>
-                      <td className="px-3 py-2">{row.wine_label}</td>
-                      <td className="px-3 py-2 text-secondary">{row.sku}</td>
-                      <td className="px-3 py-2 text-right">{row.total_stock}</td>
-                      <td className="px-3 py-2 text-right">{row.allocated_bottles}</td>
-                      <td className="px-3 py-2 text-right font-medium text-accent-buyer">{row.available_stock}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {!loadingWineryInventory && wineryInventory.length > 0 ?
+       
+            wineryInventory?.map((row: any) => (
+              <Article 
+                key={row.id}
+                id={row.id}
+                image_url={row.image_url}
+                wine_label={row.wine_label}
+                sku={row.sku}
+                description={row.description}
+                allocated_case={row.allocated_bottles}
+                allocated_bottles={row.allocated_bottles}
+                available={row.available}
+              />
+            )) : undefined
+          }
         </section>
 
         {showCreateModal && user && areaId && (

@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { supabase } from '../../lib/supabase/client'
-import {
-  getWineryInventory,
-  type WineInventory,
-} from '../../lib/supabase/queries/wineInventory'
+import { getWineryInventory, type WineInventory } from '../../lib/supabase/queries/wineInventory'
+import Article from '../../components/ui/Article'
+
 
 const PAGE_SIZE = 9
 
@@ -20,7 +19,7 @@ const parseErrorMessage = (err: unknown, fallback: string, duplicateSkuMessage: 
   return maybeMessage
 }
 
-const WineInventoryPage = () => {
+const WineInventoryListPage = () => {
   const { t } = useTranslation('wineryInventory')
   const { user } = useAuth()
   const [wineryProfileId, setWineryProfileId] = useState<string | null>(null)
@@ -85,10 +84,6 @@ const WineInventoryPage = () => {
     return sortedRows.slice(start, start + PAGE_SIZE)
   }, [sortedRows, clampedPage])
 
-  const totalAvailable = useMemo(
-    () => rows.reduce((sum, row) => sum + row.available_stock, 0),
-    [rows]
-  )
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -132,10 +127,6 @@ const WineInventoryPage = () => {
               <p className="text-xs uppercase tracking-wide text-muted">{t('stats.products')}</p>
               <p className="mt-1 text-2xl font-semibold text-primary">{rows.length}</p>
             </article>
-            <article className="rounded-2xl border border-border bg-surface-alt p-4">
-              <p className="text-xs uppercase tracking-wide text-muted">{t('stats.totalAvailableBottles')}</p>
-              <p className="mt-1 text-2xl font-semibold text-primary">{totalAvailable}</p>
-            </article>
           </div>
           <div className="mt-6">
             <Link
@@ -169,44 +160,16 @@ const WineInventoryPage = () => {
             <>
               <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {pageRows.map(row => (
-                  <article key={row.id} className="overflow-hidden rounded-2xl border border-border bg-surface-alt">
-                    {row.image_url ? (
-                      <img src={row.image_url} alt={row.wine_label} className="h-40 w-full object-cover" />
-                    ) : (
-                      <div className="flex h-40 items-center justify-center bg-surface-elevated text-sm text-muted">
-                        {t('cards.noImage')}
-                      </div>
-                    )}
-                    <div className="space-y-3 p-4">
-                      <div>
-                        <p className="text-base font-semibold text-primary">{row.wine_label}</p>
-                        <p className="text-xs uppercase tracking-wide text-secondary">{row.sku}</p>
-                        {row.description && (
-                          <p className="mt-2 line-clamp-2 text-sm text-secondary">{row.description}</p>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-center">
-                        <div className="rounded-xl bg-surface px-2 py-2">
-                          <p className="text-[10px] uppercase tracking-wide text-muted">{t('cards.total')}</p>
-                          <p className="text-sm font-semibold text-primary">{row.total_stock}</p>
-                        </div>
-                        <div className="rounded-xl bg-surface px-2 py-2">
-                          <p className="text-[10px] uppercase tracking-wide text-muted">{t('cards.allocated')}</p>
-                          <p className="text-sm font-semibold text-primary">{row.allocated_bottles}</p>
-                        </div>
-                        <div className="rounded-xl bg-surface px-2 py-2">
-                          <p className="text-[10px] uppercase tracking-wide text-muted">{t('cards.available')}</p>
-                          <p className="text-sm font-semibold text-success-text">{row.available_stock}</p>
-                        </div>
-                      </div>
-                      <Link
-                        to={`/dashboard/winery/inventory/${row.id}`}
-                        className="inline-flex w-full items-center justify-center rounded-full border border-border bg-surface px-4 py-2 text-sm font-medium text-secondary hover:bg-surface-elevated"
-                      >
-                        {t('cards.openDetail')}
-                      </Link>
-                    </div>
-                  </article>
+                  <Article key={row.id}
+                    id={row.id}
+                    image_url={row.image_url}
+                    wine_label={row.wine_label}
+                    sku={row.sku}
+                    description={row.description}
+                    allocated_case={row.allocated_case}
+                    allocated_bottles={row.allocated_bottles}
+                    available={row.available}
+                  />
                 ))}
               </div>
 
@@ -241,4 +204,4 @@ const WineInventoryPage = () => {
   )
 }
 
-export default WineInventoryPage
+export default WineInventoryListPage

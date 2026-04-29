@@ -19,7 +19,8 @@
     "openDetail": "Open detail",
     "noImage": "No image",
     "total": "Total",
-    "allocated": "Allocated",
+    "allocated_bottles": "Allocated bottles per case",
+    "allocated_case": "Allocated cases",
     "available": "Available",
     "pageStatus": "Page {{page}} of {{totalPages}}",
     "prevPage": "Previous",
@@ -36,6 +37,10 @@
     "skuPlaceholder": "e.g. CAU-RR-001",
     "totalStock": "Total Stock (bottles)",
     "totalStockPlaceholder": "0",
+    "allocated_case": "Allocated cases",
+    "allocated_bottles": "Allocated bottles per case",
+    "allocated_casePlaceholder": "0",
+    "allocated_bottlesPlaceholder": "0",
     "save": "Saving...",
     "addButton": "Add Product",
     "updateButton": "Update Product",
@@ -90,5 +95,14 @@
     "saveFailed": "Failed to save wine product.",
     "deleteFailed": "Failed to delete wine product."
   },
-  "confirmDelete": "Delete product \"{{wineLabel}}\"? This action cannot be undone."
+  "confirmDelete": "Delete product \"{{wineLabel}}\"? This action cannot be undone.",
+  "detail": {
+    "backToDashboard": "Back to dashboard",
+    "notFound": "Product not found or not accessible.",
+    "availability": "Availability",
+    "available": "Available",
+    "notAvailable": "Not available",
+    "allocatedBottles": "Allocated bottles per case",
+    "availableStock": "Available stock (bottles)"
+  }
 }

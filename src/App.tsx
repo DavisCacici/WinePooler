@@ -13,8 +13,9 @@ const ProtectedDashboardRoute = lazy(() => import('./pages/dashboards/ProtectedD
 const BuyerProfileForm = lazy(() => import('./pages/profile/BuyerProfileForm'))
 const AreaSelectionPage = lazy(() => import('./pages/profile/AreaSelectionPage'))
 const PurchasingPreferencesForm = lazy(() => import('./pages/profile/PurchasingPreferencesForm'))
-const WineInventoryPage = lazy(() => import('./pages/winery/WineInventoryPage'))
-const WineInventoryProductPage = lazy(() => import('./pages/winery/WineInventoryProductPage'))
+const WineInventoryListPage = lazy(() => import('./pages/winery/WineInventoryListPage'))
+const WineInventoryEditPage = lazy(() => import('./pages/winery/WineInventoryEditPage'))
+const WineInventoryDetailPage = lazy(() => import('./pages/winery/WineInventoryDetailPage'))
 const LayoutShell = lazy(() => import('./components/layout/LayoutShell'));
 const WineryProfileForm = lazy(() => import('./pages/profile/WineryProfileForm'));
 
@@ -70,7 +71,7 @@ const App = () => {
             element={
               <ProtectedDashboardRoute allowedRole="winery">
                 <LayoutShell>
-                  <WineInventoryPage />
+                  <WineInventoryListPage />
                 </LayoutShell>
               </ProtectedDashboardRoute>
             }
@@ -80,7 +81,7 @@ const App = () => {
             element={
               <ProtectedDashboardRoute allowedRole="winery">
                 <LayoutShell>
-                  <WineInventoryProductPage />
+                  <WineInventoryEditPage />
                 </LayoutShell>
               </ProtectedDashboardRoute>
             }
@@ -90,7 +91,17 @@ const App = () => {
             element={
               <ProtectedDashboardRoute allowedRole="winery">
                 <LayoutShell>
-                  <WineInventoryProductPage />
+                  <WineInventoryEditPage />
+                </LayoutShell>
+              </ProtectedDashboardRoute>
+            }
+          />
+          <Route
+            path="/dashboard/buyer/inventory/:inventoryId"
+            element={
+              <ProtectedDashboardRoute allowedRole="buyer">
+                <LayoutShell>
+                  <WineInventoryDetailPage />
                 </LayoutShell>
               </ProtectedDashboardRoute>
             }
