@@ -372,7 +372,7 @@ const WineInventoryEditPage = () => {
                 inputSize='md'
               />
               <Input
-                label={t('product.price')}
+                label={t('product.price') + ' €'}
                 id="price"
                 type="number"
                 inputSize='md'
