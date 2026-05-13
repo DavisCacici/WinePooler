@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { getWineInventoryByIdPublic } from '../../lib/supabase/queries/wineInventory'
-import type { WineryInventoryRow } from '../../lib/supabase/queries/wineInventory'
+import type { WineryInventoryRow } from '../../lib/interfaces/WineInvetory'
 
 const WineInventoryDetailPage = () => {
   const { t } = useTranslation('wineryInventory')

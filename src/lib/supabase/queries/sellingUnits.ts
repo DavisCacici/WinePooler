@@ -1,24 +1,5 @@
+import type { PalletThresholdInfo, ProductSellingUnit, SellingUnit, UnitPrice } from '../../interfaces/SellingUnit'
 import { supabase } from '../client'
-
-export interface SellingUnit {
-  id: string
-  winery_id: string
-  unit_type: 'bottle' | 'case' | 'pallet'
-  bottles_per_case: number | null
-  composition_type: 'bottles' | 'cases' | null
-  pallet_quantity: number | null
-  discount_pct: number
-  created_at: string
-  updated_at: string
-}
-
-export interface PalletThresholdInfo {
-  threshold: number
-  displayUnit: string
-  displayUnitLabel: string
-  bottlesPerDisplayUnit: number | null
-}
-
 /**
  * Computes the pallet threshold (in bottles) from the winery's selling unit config.
  * Falls back to 600 if no pallet unit is defined.
@@ -57,13 +38,7 @@ export const computePalletThreshold = async (wineryId: string): Promise<PalletTh
   }
 }
 
-export interface ProductSellingUnit {
-  id: string
-  inventory_id: string
-  selling_unit_id: string
-  enabled: boolean
-  created_at: string
-}
+
 
 export const getSellingUnitsByWinery = async (wineryId: string): Promise<SellingUnit[]> => {
   const { data, error } = await supabase
@@ -171,15 +146,7 @@ export const toBottleEquivalent = (
   throw new Error(`Unknown unit type: ${unitType}`)
 }
 
-export interface UnitPrice {
-  unitType: string
-  unitLabel: string
-  bulkPrice: number
-  retailPrice: number | null
-  savingPct: number | null
-  bottleEquivalent: number
-  discountPct: number
-}
+
 
 /**
  * Computes per-unit bulk and retail prices from selling unit definitions.

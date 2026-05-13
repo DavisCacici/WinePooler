@@ -3,18 +3,21 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { getBuyerProfile } from '../../lib/supabase/queries/buyerProfile'
-import { getBuyerPreferences, type BuyerPreferences } from '../../lib/supabase/queries/buyerPreferences'
+import { getBuyerPreferences } from '../../lib/supabase/queries/buyerPreferences'
 import { getPalletsByArea, buyerHasOrderOnPallet } from '../../lib/supabase/queries/virtualPallets'
 import { palletProgressLabel, palletProgressUnitLabel } from '../../lib/palletProgress'
-import { getSellingUnitsByWinery, computeUnitPrices, type UnitPrice } from '../../lib/supabase/queries/sellingUnits'
+import { getSellingUnitsByWinery, computeUnitPrices } from '../../lib/supabase/queries/sellingUnits'
 import CreatePalletModal from '../pallets/CreatePalletModal'
 import AddOrderModal from '../pallets/AddOrderModal'
 import FreezeNotification from '../../components/notifications/FreezeNotification'
 import PalletPricingBadge from '../../components/pallets/PalletPricingBadge'
 import InventoryStatusBadge from '../../components/pallets/InventoryStatusBadge'
 import { supabase } from '../../lib/supabase/client'
-import { getAllWineryInventory, type WineryInventoryRow } from '../../lib/supabase/queries/wineInventory'
+import { getAllWineryInventory } from '../../lib/supabase/queries/wineInventory'
 import Article from '../../components/ui/Article'
+import type { UnitPrice } from '../../lib/interfaces/SellingUnit'
+import type { BuyerPreferences } from '../../lib/interfaces/BuyerPreferences'
+import type { WineryInventoryRow } from '../../lib/interfaces/WineInvetory'
 
 interface BuyerPalletCard {
   id: string
@@ -30,7 +33,6 @@ interface BuyerPalletCard {
   bulkPrice: number | null
   retailPrice: number | null
   availableStock: number | null
-  totalStock: number | null
   allocatedBottles: number | null
   inventoryId: string | null
   displayUnit: string | null
@@ -237,7 +239,6 @@ const BuyerDashboard = () => {
             bulkPrice: row.bulk_price_per_bottle,
             retailPrice: row.retail_price_per_bottle,
             availableStock: row.available_stock,
-            totalStock: row.total_stock,
             allocatedBottles: row.allocated_bottles,
             inventoryId: row.inventory_id,
             displayUnit: row.display_unit,
@@ -514,7 +515,7 @@ const BuyerDashboard = () => {
                     <InventoryStatusBadge
                       availableStock={pallet.availableStock}
                       allocatedBottles={pallet.allocatedBottles}
-                      totalStock={pallet.totalStock}
+                      totalStock={0}
                       syncError={pallet.inventorySyncError}
                     />
                     <button
@@ -590,7 +591,6 @@ const BuyerDashboard = () => {
               retail_price_per_bottle: activePalletForOrder.retailPrice,
               inventory_id: activePalletForOrder.inventoryId,
               available_stock: activePalletForOrder.availableStock,
-              total_stock: activePalletForOrder.totalStock,
               allocated_bottles: activePalletForOrder.allocatedBottles,
               display_unit: activePalletForOrder.displayUnit,
               display_unit_label: activePalletForOrder.displayUnitLabel,

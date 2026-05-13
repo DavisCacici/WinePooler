@@ -1,12 +1,5 @@
+import type { BuyerPreferences } from '../../interfaces/BuyerPreferences'
 import { supabase } from '../client'
-
-export interface BuyerPreferences {
-  user_id: string
-  preferred_wine_types: string[]
-  preferred_appellations: string[]
-  monthly_budget_min: number | null
-  monthly_budget_max: number | null
-}
 
 export const getBuyerPreferences = async (userId: string): Promise<BuyerPreferences | null> => {
   const { data, error } = await supabase

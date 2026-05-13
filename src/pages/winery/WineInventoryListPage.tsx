@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../lib/supabase/AuthContext'
 import { supabase } from '../../lib/supabase/client'
-import { getWineryInventory, type WineInventory } from '../../lib/supabase/queries/wineInventory'
+import { getWineryInventory } from '../../lib/supabase/queries/wineInventory'
 import Article from '../../components/ui/Article'
+import type { WineInventory } from '../../lib/interfaces/WineInvetory'
 
 
 const PAGE_SIZE = 9
